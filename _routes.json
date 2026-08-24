@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "include": [
+    "/*"
+  ],
+  "exclude": [
+    "/assets/*",
+    "/*.html",
+    "/index.html",
+    "/favicon.ico",
+    "/robots.txt",
+    "/_headers",
+    "/_redirects",
+    "/_routes.json"
+  ]
+}

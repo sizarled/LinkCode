@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="LinkCode turns long links into memorable numeric codes. Unlock links, earn from valid visits, and reward your audience.">
+  <meta name="theme-color" content="#071513">
+  <title>LinkCode — One Code. Any Destination.</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23c8ff62'/%3E%3Cpath d='M26 39l-4 4a8 8 0 01-11-11l9-9a8 8 0 0111 0' fill='none' stroke='%23071513' stroke-width='6' stroke-linecap='round'/%3E%3Cpath d='M38 25l4-4a8 8 0 0111 11l-9 9a8 8 0 01-11 0' fill='none' stroke='%23071513' stroke-width='6' stroke-linecap='round'/%3E%3Cpath d='M24 32h16' stroke='%23071513' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      --ink: #071513;
+      --ink-2: #102521;
+      --muted: #65726e;
+      --surface: #ffffff;
+      --surface-soft: #f3f7f4;
+      --line: #dbe5df;
+      --lime: #c8ff62;
+      --lime-deep: #a8e53c;
+      --mint: #c6f7df;
+      --purple: #8f7cff;
+      --orange: #ff9c68;
+      --danger: #c23d46;
+      --shadow-sm: 0 8px 26px rgba(7, 21, 19, .08);
+      --shadow-lg: 0 30px 80px rgba(7, 21, 19, .16);
+      --radius-sm: 12px;
+      --radius-md: 20px;
+      --radius-lg: 30px;
+      --max: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 96px; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: var(--surface);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    body.menu-open, body.modal-open { overflow: hidden; }
+    ::selection { color: var(--ink); background: var(--lime); }
+    .scroll-progress {
+      position: fixed; inset: 0 auto auto 0; z-index: 200; width: 0; height: 3px;
+      background: linear-gradient(90deg, var(--lime), #79e9be, var(--purple));
+      box-shadow: 0 0 16px rgba(200,255,98,.7); pointer-events: none;
+    }
+    button, input, textarea, select { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    a { color: inherit; text-decoration: none; }
+    img, svg { display: block; }
+    section { position: relative; }
+    .container { width: min(calc(100% - 40px), var(--max)); margin-inline: auto; }
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 14px;
+      color: #38514b;
+      font-size: .75rem;
+      font-weight: 800;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before { content: ""; width: 22px; height: 2px; border-radius: 9px; background: var(--lime-deep); }
+    .section-heading { max-width: 690px; margin-bottom: 46px; }
+    .section-heading.center { text-align: center; margin-inline: auto; }
+    .section-heading.center .eyebrow::before { display: none; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2, h3 { line-height: 1.08; letter-spacing: -.035em; }
+    h2 { font-size: clamp(2.15rem, 4vw, 3.75rem); margin-bottom: 16px; }
+    .section-heading > p:last-child { margin: 0; color: var(--muted); font-size: 1.05rem; }
+
+    /* Header */
+    .site-header {
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 100;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: rgba(7, 21, 19, .72);
+      backdrop-filter: blur(18px);
+      transition: padding .25s ease, background .25s ease, box-shadow .25s ease;
+    }
+    .site-header.scrolled { padding: 9px 0; background: rgba(7, 21, 19, .94); box-shadow: 0 10px 30px rgba(0,0,0,.14); }
+    .nav-wrap { display: flex; align-items: center; gap: 32px; min-height: 48px; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; color: #fff; flex: 0 0 auto; }
+    .brand-mark {
+      width: 38px; height: 38px; display: grid; place-items: center;
+      border-radius: 11px; background: var(--lime); color: var(--ink);
+      box-shadow: 0 0 0 5px rgba(200, 255, 98, .08);
+    }
+    .brand-mark svg { width: 23px; height: 23px; }
+    .brand-name { font-size: 1.16rem; font-weight: 850; letter-spacing: -.03em; }
+    .nav-links { display: flex; align-items: center; justify-content: center; gap: 28px; margin: 0 auto; }
+    .nav-links a { color: #c6d1ce; font-size: .9rem; font-weight: 650; transition: color .2s ease; }
+    .nav-links a:hover, .nav-links a.active { color: var(--lime); }
+    .auth-actions { display: flex; align-items: center; gap: 10px; flex: 0 0 auto; }
+    .btn {
+      min-height: 46px;
+      padding: 0 18px;
+      border: 1px solid transparent;
+      border-radius: 11px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      cursor: pointer;
+      font-weight: 780;
+      font-size: .92rem;
+      transition: transform .2s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+      outline: 3px solid rgba(143,124,255,.42); outline-offset: 3px;
+    }
+    .btn-ghost { color: #edf6f3; border-color: rgba(255,255,255,.17); background: rgba(255,255,255,.04); }
+    .btn-ghost:hover { border-color: rgba(255,255,255,.34); background: rgba(255,255,255,.08); }
+    .btn-lime { color: var(--ink); background: var(--lime); box-shadow: 0 10px 24px rgba(200,255,98,.12); }
+    .btn-lime:hover { background: #d4ff82; box-shadow: 0 13px 30px rgba(200,255,98,.2); }
+    .btn-dark { background: var(--ink); color: white; }
+    .btn-dark:hover { background: #15312b; box-shadow: var(--shadow-sm); }
+    .menu-toggle {
+      width: 44px; height: 44px; padding: 0; border: 1px solid rgba(255,255,255,.15); border-radius: 10px;
+      display: none; place-items: center; background: rgba(255,255,255,.04); color: white; cursor: pointer;
+    }
+    .menu-toggle svg { width: 23px; height: 23px; }
+    .auth-logged { display: none; }
+    body.is-authenticated .auth-guest { display: none; }
+    body.is-authenticated .auth-logged { display: inline-flex; }
+
+    /* Hero */
+    .hero {
+      min-height: 790px;
+      padding: 176px 0 108px;
+      overflow: hidden;
+      color: white;
+      background:
+        radial-gradient(circle at 78% 22%, rgba(143,124,255,.25), transparent 25%),
+        radial-gradient(circle at 54% 87%, rgba(200,255,98,.10), transparent 28%),
+        var(--ink);
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: .14;
+      background-image:
+        linear-gradient(rgba(255,255,255,.11) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.11) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: linear-gradient(to bottom, black, transparent 92%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: "";
+      position: absolute; width: 520px; height: 520px; border-radius: 50%;
+      right: -260px; bottom: -270px; border: 1px solid rgba(200,255,98,.18);
+      box-shadow: 0 0 0 80px rgba(200,255,98,.025), 0 0 0 160px rgba(200,255,98,.018);
+    }
+    .hero-ambient { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+    .hero-ambient span { position: absolute; display: block; border-radius: 50%; filter: blur(2px); }
+    .hero-ambient span:nth-child(1) {
+      width: 380px; height: 380px; left: -150px; top: 150px;
+      background: radial-gradient(circle, rgba(200,255,98,.1), transparent 69%);
+      animation: ambientDrift 10s ease-in-out infinite alternate;
+    }
+    .hero-ambient span:nth-child(2) {
+      width: 260px; height: 260px; left: 46%; top: -120px;
+      background: radial-gradient(circle, rgba(143,124,255,.16), transparent 70%);
+      animation: ambientDrift 13s ease-in-out -4s infinite alternate-reverse;
+    }
+    .hero-ambient span:nth-child(3) {
+      width: 8px; height: 8px; left: 47%; top: 28%; background: var(--lime);
+      box-shadow: 0 0 22px 5px rgba(200,255,98,.32); animation: pulseDot 3s ease-in-out infinite;
+    }
+    @keyframes ambientDrift { to { transform: translate3d(45px, 35px, 0) scale(1.12); } }
+    @keyframes pulseDot { 50% { opacity: .4; transform: scale(.55); } }
+    @keyframes borderFlow { to { background-position: 200% center; } }
+    @keyframes floatSoft { 50% { transform: translateY(-10px) rotate(var(--rotation, 0deg)); } }
+    .hero-grid { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(400px, .88fr); align-items: center; gap: 72px; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 9px; margin-bottom: 22px; padding: 8px 12px;
+      color: #dff0eb; border: 1px solid rgba(255,255,255,.13); border-radius: 99px;
+      background: rgba(255,255,255,.055); font-size: .78rem; font-weight: 750;
+    }
+    .pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 0 5px rgba(200,255,98,.11); }
+    .hero h1 { max-width: 720px; margin-bottom: 22px; font-size: clamp(3rem, 6.4vw, 6.2rem); letter-spacing: -.065em; }
+    .hero h1 span {
+      color: transparent;
+      background: linear-gradient(100deg, var(--lime) 5%, #efffcf 44%, #8cf2c7 88%);
+      -webkit-background-clip: text; background-clip: text;
+      filter: drop-shadow(0 10px 28px rgba(200,255,98,.1));
+    }
+    .hero-copy > p { max-width: 620px; margin-bottom: 34px; color: #aebfba; font-size: clamp(1.02rem, 1.6vw, 1.18rem); }
+    .code-panel {
+      position: relative; max-width: 655px; padding: 9px; display: flex; align-items: center; gap: 8px;
+      border: 1px solid transparent; border-radius: 17px;
+      background:
+        linear-gradient(#fff, #fff) padding-box,
+        linear-gradient(110deg, var(--lime), #79e9be, var(--purple), var(--orange), var(--lime)) border-box;
+      background-size: 100% 100%, 200% 100%;
+      box-shadow: 0 22px 50px rgba(0,0,0,.24), 0 0 0 5px rgba(255,255,255,.035);
+      animation: borderFlow 7s linear infinite;
+    }
+    .code-panel::after {
+      content: ""; position: absolute; inset: auto 8% -20px; height: 28px; z-index: -1;
+      background: linear-gradient(90deg, rgba(200,255,98,.25), rgba(143,124,255,.25));
+      filter: blur(23px); opacity: .65;
+    }
+    .code-input-wrap { position: relative; flex: 1; min-width: 0; }
+    .code-icon { position: absolute; left: 15px; top: 50%; translate: 0 -50%; width: 21px; height: 21px; color: #5e716b; }
+    .code-input {
+      width: 100%; height: 58px; padding: 0 14px 0 48px; border: 0; border-radius: 10px;
+      background: #f1f5f3; color: var(--ink); font-size: 1.05rem; font-weight: 700; letter-spacing: .05em;
+    }
+    .code-input::placeholder { color: #83908c; letter-spacing: 0; font-weight: 550; }
+    .code-input:focus { outline: 2px solid var(--purple); background: white; }
+    .unlock-btn { min-width: 164px; height: 58px; border-radius: 11px; }
+    .unlock-btn svg { width: 18px; height: 18px; }
+    .form-message { min-height: 22px; margin: 9px 0 0 8px; color: #ffaf9d; font-size: .82rem; font-weight: 650; }
+    .hero-search-action { max-width: 655px; margin-top: 2px; }
+    .hero-search-button { width: fit-content; min-height: 47px; padding: 0 15px; display: inline-flex; align-items: center; gap: 9px; border: 1px solid rgba(255,255,255,.14); border-radius: 11px; color: #edf5f2; background: rgba(255,255,255,.055); font-size: .75rem; font-weight: 800; transition: transform .2s ease, border-color .2s ease, background .2s ease; }
+    .hero-search-button:hover { transform: translateY(-2px); border-color: rgba(200,255,98,.45); background: rgba(200,255,98,.09); }
+    .hero-search-button svg { width: 18px; height: 18px; color: var(--lime); }
+    .hero-search-button span { margin-left: 3px; padding-left: 11px; border-left: 1px solid rgba(255,255,255,.14); color: #81948d; font-size: .62rem; font-weight: 680; }
+    .hero-proof { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 23px; color: #9caeaa; font-size: .82rem; font-weight: 650; }
+    .hero-proof span { display: inline-flex; align-items: center; gap: 7px; }
+    .hero-proof svg { width: 16px; height: 16px; color: var(--lime); }
+
+    .hero-visual { position: relative; min-height: 490px; perspective: 1100px; transform-style: preserve-3d; }
+    .hero-visual::before {
+      content: ""; position: absolute; width: 330px; height: 330px; left: 70px; top: 78px; border-radius: 50%;
+      background: conic-gradient(from 20deg, rgba(200,255,98,.18), rgba(143,124,255,.16), transparent 45%, rgba(255,156,104,.12), rgba(200,255,98,.18));
+      filter: blur(38px); opacity: .65; animation: spinGlow 18s linear infinite;
+    }
+    @keyframes spinGlow { to { transform: rotate(360deg); } }
+    .orbit { position: absolute; inset: 26px -10px auto auto; width: 430px; height: 430px; border: 1px solid rgba(255,255,255,.09); border-radius: 50%; animation: orbitSpin 30s linear infinite; }
+    @keyframes orbitSpin { to { transform: rotate(360deg); } }
+    .orbit::before, .orbit::after { content: ""; position: absolute; border-radius: 50%; border: 1px dashed rgba(200,255,98,.15); }
+    .orbit::before { inset: 55px; }
+    .orbit::after { inset: 120px; }
+    .visual-card {
+      position: absolute; left: 12px; top: 70px; width: min(100%, 410px); padding: 25px;
+      border: 1px solid rgba(255,255,255,.12); border-radius: 25px;
+      background: linear-gradient(145deg, rgba(255,255,255,.115), rgba(255,255,255,.05));
+      box-shadow: 0 35px 80px rgba(0,0,0,.28); backdrop-filter: blur(18px);
+      transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) rotateZ(-2deg);
+      transform-style: preserve-3d; transition: transform .18s ease-out, border-color .25s ease;
+    }
+    .visual-card:hover { border-color: rgba(200,255,98,.26); }
+    .visual-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+    .visual-label { color: #9eb0aa; font-size: .72rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    .live-pill { padding: 5px 9px; border-radius: 99px; background: rgba(200,255,98,.12); color: var(--lime); font-size: .68rem; font-weight: 850; }
+    .visual-code { display: flex; gap: 9px; margin-bottom: 27px; }
+    .visual-code span {
+      width: 48px; height: 58px; display: grid; place-items: center; border-radius: 12px;
+      background: rgba(255,255,255,.09); color: #fff; font-size: 1.42rem; font-weight: 850;
+      border: 1px solid rgba(255,255,255,.1);
+    }
+    .visual-code span:nth-child(4) { color: var(--lime); border-color: rgba(200,255,98,.32); }
+    .visual-route { padding-top: 19px; border-top: 1px solid rgba(255,255,255,.1); }
+    .route-row { display: flex; align-items: center; gap: 13px; }
+    .route-node { width: 39px; height: 39px; display: grid; place-items: center; border-radius: 11px; background: var(--lime); color: var(--ink); }
+    .route-node svg { width: 19px; height: 19px; }
+    .route-text strong { display: block; font-size: .86rem; }
+    .route-text span { color: #91a39e; font-size: .73rem; }
+    .route-arrow { margin-left: auto; color: var(--lime); }
+    .floating-stat {
+      position: absolute; right: -2px; bottom: 73px; width: 180px; padding: 17px 18px; border-radius: 17px;
+      color: var(--ink); background: var(--lime); box-shadow: 0 25px 55px rgba(0,0,0,.24); transform: rotate(4deg);
+    }
+    .floating-stat small { display: block; margin-bottom: 3px; font-size: .7rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+    .floating-stat strong { display: block; font-size: 1.55rem; letter-spacing: -.05em; }
+    .floating-stat span { font-size: .7rem; font-weight: 700; opacity: .66; }
+    .floating-shield {
+      position: absolute; left: -15px; bottom: 31px; width: 62px; height: 62px; display: grid; place-items: center;
+      border: 1px solid rgba(255,255,255,.12); border-radius: 18px; color: white; background: var(--purple);
+      box-shadow: 0 20px 45px rgba(0,0,0,.22); transform: rotate(-7deg);
+    }
+    .floating-shield svg { width: 28px; height: 28px; }
+    .code-float {
+      position: absolute; z-index: 3; display: inline-flex; align-items: center; gap: 7px; padding: 8px 11px;
+      border: 1px solid rgba(255,255,255,.13); border-radius: 99px; color: #c6d4cf;
+      background: rgba(12,31,27,.78); backdrop-filter: blur(12px); box-shadow: 0 14px 30px rgba(0,0,0,.2);
+      font: 750 .7rem/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em;
+      animation: floatSoft 5s ease-in-out infinite;
+    }
+    .code-float::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 9px rgba(200,255,98,.6); }
+    .code-float.one { --rotation: 4deg; right: 8px; top: 37px; transform: rotate(4deg); animation-delay: -.8s; }
+    .code-float.two { --rotation: -5deg; left: -24px; top: 248px; transform: rotate(-5deg); animation-delay: -2.4s; }
+
+    /* Proof rail */
+    .signal-strip { position: relative; z-index: 5; margin-top: -38px; }
+    .signal-shell {
+      display: grid; grid-template-columns: repeat(4, 1fr); overflow: hidden;
+      border: 1px solid var(--line); border-radius: 21px; background: rgba(255,255,255,.92);
+      box-shadow: 0 24px 60px rgba(7,21,19,.12); backdrop-filter: blur(18px);
+    }
+    .signal-item { position: relative; padding: 23px 26px; }
+    .signal-item:not(:last-child)::after { content: ""; position: absolute; right: 0; top: 22%; bottom: 22%; width: 1px; background: var(--line); }
+    .signal-item strong { display: block; margin-bottom: 2px; font-size: 1.55rem; line-height: 1; letter-spacing: -.05em; }
+    .signal-item strong span { color: #638c40; }
+    .signal-item small { color: #72807b; font-size: .7rem; font-weight: 760; letter-spacing: .025em; }
+
+    /* Features */
+    .features { padding: 118px 0; background: var(--surface); }
+    .feature-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 18px; }
+    .feature-card {
+      --mouse-x: 50%; --mouse-y: 50%;
+      position: relative; grid-column: span 4; min-height: 285px; padding: 30px; overflow: hidden;
+      border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface);
+      transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+      isolation: isolate;
+    }
+    .feature-card:nth-child(1), .feature-card:nth-child(4), .feature-card:nth-child(5), .feature-card:nth-child(7), .feature-card:nth-child(10) { grid-column: span 5; }
+    .feature-card:nth-child(2), .feature-card:nth-child(3), .feature-card:nth-child(6), .feature-card:nth-child(8), .feature-card:nth-child(9) { grid-column: span 7; }
+    .feature-card::before {
+      content: ""; position: absolute; inset: 0; z-index: -1; opacity: 0; pointer-events: none;
+      background: radial-gradient(260px circle at var(--mouse-x) var(--mouse-y), rgba(143,124,255,.13), transparent 68%);
+      transition: opacity .25s ease;
+    }
+    .feature-card::after {
+      content: ""; position: absolute; width: 130px; height: 130px; right: -55px; bottom: -62px; z-index: -1;
+      border: 1px solid rgba(7,21,19,.08); border-radius: 50%; box-shadow: 0 0 0 27px rgba(7,21,19,.025);
+      transition: transform .35s ease;
+    }
+    .feature-card:hover { transform: translateY(-7px); box-shadow: 0 24px 60px rgba(7,21,19,.11); border-color: #c7d5cd; }
+    .feature-card:hover::before { opacity: 1; }
+    .feature-card:hover::after { transform: scale(1.14); }
+    .feature-card.feature-dark { color: white; background: var(--ink-2); border-color: var(--ink-2); }
+    .feature-card.feature-lime { background: var(--lime); border-color: var(--lime); }
+    .feature-icon {
+      width: 50px; height: 50px; display: grid; place-items: center; margin-bottom: 43px;
+      border-radius: 14px; color: var(--ink); background: var(--mint);
+    }
+    .feature-dark .feature-icon { background: rgba(255,255,255,.09); color: var(--lime); }
+    .feature-lime .feature-icon { background: rgba(7,21,19,.1); }
+    .feature-dark::before { background: radial-gradient(280px circle at var(--mouse-x) var(--mouse-y), rgba(200,255,98,.14), transparent 68%); }
+    .feature-dark::after { border-color: rgba(255,255,255,.08); box-shadow: 0 0 0 27px rgba(255,255,255,.025); }
+    .feature-lime::before { background: radial-gradient(280px circle at var(--mouse-x) var(--mouse-y), rgba(255,255,255,.45), transparent 68%); }
+    .feature-icon { transition: transform .3s ease, border-radius .3s ease; }
+    .feature-card:hover .feature-icon { transform: translateY(-3px) rotate(-4deg) scale(1.05); border-radius: 17px; }
+    .feature-icon svg { width: 24px; height: 24px; }
+    .feature-card h3 { margin-bottom: 10px; font-size: 1.25rem; }
+    .feature-card p { margin: 0; color: var(--muted); font-size: .9rem; }
+    .feature-dark p { color: #9fb1ac; }
+    .feature-lime p { color: #385047; }
+    .feature-number { position: absolute; top: 25px; right: 26px; color: #a9b7b2; font-size: .7rem; font-weight: 850; }
+    .feature-dark .feature-number { color: #63746f; }
+    .feature-lime .feature-number { color: rgba(7,21,19,.4); }
+
+    /* Earnings */
+    .earnings { padding: 118px 0; overflow: hidden; background: var(--surface-soft); }
+    .earnings::before { content: ""; position: absolute; width: 410px; height: 410px; top: -190px; right: -160px; border-radius: 50%; background: rgba(143,124,255,.12); filter: blur(1px); }
+    .earnings-top { display: flex; align-items: end; justify-content: space-between; gap: 30px; margin-bottom: 38px; }
+    .earnings-top .section-heading { margin-bottom: 0; }
+    .level-picker { width: min(100%, 390px); }
+    .level-picker label { display: block; margin: 0 0 8px 2px; color: #52615d; font-size: .74rem; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; }
+    .select-wrap { position: relative; }
+    .level-select {
+      width: 100%; min-height: 55px; appearance: none; padding: 0 48px 0 17px;
+      color: var(--ink); border: 1px solid #cdd9d2; border-radius: 13px; background: white;
+      font-weight: 780; cursor: pointer; box-shadow: 0 7px 25px rgba(7,21,19,.05);
+    }
+    .select-wrap svg { position: absolute; right: 17px; top: 50%; translate: 0 -50%; width: 18px; height: 18px; pointer-events: none; }
+    .level-track {
+      position: relative; display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 22px;
+      padding: 7px; border: 1px solid rgba(213,223,217,.85); border-radius: 17px; background: rgba(255,255,255,.52);
+      backdrop-filter: blur(10px);
+    }
+    .level-btn {
+      position: relative; min-height: 62px; padding: 8px; border: 1px solid transparent; border-radius: 11px;
+      background: transparent; color: #6a7773; cursor: pointer; transition: .22s ease;
+    }
+    .level-btn strong { display: block; color: inherit; font-size: .88rem; }
+    .level-btn span { display: block; font-size: .66rem; font-weight: 650; }
+    .level-btn:hover { border-color: #a6b7ad; background: white; }
+    .level-btn.active { border-color: var(--ink); background: var(--ink); color: white; box-shadow: 0 10px 24px rgba(7,21,19,.16); }
+    .level-btn.active strong { color: var(--lime); }
+    .level-summary {
+      display: grid; grid-template-columns: 1.2fr .8fr .8fr; gap: 1px; margin-bottom: 20px;
+      overflow: hidden; border: 1px solid var(--line); border-radius: 18px; background: var(--line);
+    }
+    .summary-item { padding: 20px 22px; background: white; }
+    .summary-item small { display: block; margin-bottom: 6px; color: #75817d; font-size: .68rem; font-weight: 850; letter-spacing: .09em; text-transform: uppercase; }
+    .summary-item strong { display: block; font-size: 1.13rem; line-height: 1.35; }
+    .summary-item strong em { color: #567340; font-style: normal; }
+    .summary-item:first-child strong { color: var(--danger); }
+    .summary-item:first-child strong.earning { color: #467329; }
+    .table-shell { overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-md); background: white; box-shadow: var(--shadow-sm); }
+    .rate-toolbar {
+      display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 18px 20px;
+      border-bottom: 1px solid var(--line); background: #fff;
+    }
+    .rate-toolbar-title { display: flex; align-items: center; gap: 12px; min-width: max-content; }
+    .rate-toolbar-icon { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 11px; color: var(--ink); background: var(--lime); }
+    .rate-toolbar-icon svg { width: 19px; height: 19px; }
+    .rate-toolbar-title strong { display: block; font-size: .86rem; }
+    .rate-toolbar-title span { display: block; color: #7a8783; font-size: .68rem; font-weight: 700; }
+    .rate-filters { display: flex; justify-content: flex-end; gap: 9px; width: min(100%, 490px); }
+    .country-search { position: relative; flex: 1; }
+    .country-search svg { position: absolute; left: 12px; top: 50%; translate: 0 -50%; width: 17px; height: 17px; color: #7a8783; pointer-events: none; }
+    .country-search input, .tier-filter {
+      width: 100%; height: 42px; border: 1px solid #d7e1db; border-radius: 10px; color: var(--ink); background: #f8faf9;
+      font-size: .78rem; font-weight: 650; transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
+    }
+    .country-search input { padding: 0 12px 0 38px; }
+    .tier-filter { width: 124px; padding: 0 9px; cursor: pointer; }
+    .country-search input:focus, .tier-filter:focus { outline: none; border-color: var(--purple); background: white; box-shadow: 0 0 0 3px rgba(143,124,255,.11); }
+    .table-scroll { max-height: 620px; overflow: auto; scrollbar-color: #b8c8bf #edf2ef; scrollbar-width: thin; }
+    .table-scroll::-webkit-scrollbar { width: 9px; height: 9px; }
+    .table-scroll::-webkit-scrollbar-track { background: #edf2ef; }
+    .table-scroll::-webkit-scrollbar-thumb { border: 2px solid #edf2ef; border-radius: 99px; background: #b8c8bf; }
+    .rate-table { width: 100%; min-width: 760px; border-collapse: collapse; }
+    .rate-table th { position: sticky; top: 0; z-index: 2; padding: 15px 20px; color: #65736e; background: #ecf2ee; box-shadow: inset 0 -1px 0 var(--line); font-size: .7rem; font-weight: 850; letter-spacing: .1em; text-align: left; text-transform: uppercase; }
+    .rate-table td { padding: 14px 20px; border-top: 1px solid var(--line); vertical-align: middle; }
+    .rate-table tbody tr { transition: background .2s ease; }
+    .rate-table tbody tr:hover { background: #f8fcf9; }
+    .tier-cell { width: 126px; }
+    .tier-tag { display: inline-flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 9px; font-size: .76rem; font-weight: 850; white-space: nowrap; }
+    .tier-tag::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+    .tier-1 { color: #5b4ac1; background: #eeebff; }
+    .tier-2 { color: #286c50; background: #e4f7ee; }
+    .tier-3 { color: #9a552f; background: #fff0e7; }
+    .tier-4 { color: #596864; background: #edf1ef; }
+    .country-cell { display: flex; align-items: center; gap: 12px; min-width: 220px; }
+    .country-flag {
+      flex: 0 0 auto; width: 42px; height: 30px; display: block; object-fit: cover;
+      border: 1px solid #d7e0db; border-radius: 7px; background: #f4f7f5;
+      box-shadow: 0 3px 9px rgba(7,21,19,.09);
+    }
+    .country-meta strong { display: block; color: var(--ink); font-size: .86rem; line-height: 1.25; }
+    .country-meta span { display: block; margin-top: 3px; color: #8a9692; font-size: .64rem; font-weight: 800; letter-spacing: .09em; }
+    .no-country-results td { padding: 38px 20px; color: #778580; text-align: center; font-size: .83rem; }
+    .base-rate { color: #62716d; font-size: .83rem; font-weight: 650; white-space: nowrap; }
+    .dynamic-rate { color: var(--ink); font-size: 1.05rem; font-weight: 850; white-space: nowrap; }
+    .dynamic-rate .rate-pill, .dynamic-rate .zero {
+      display: inline-flex; padding: 7px 10px; border-radius: 9px; background: #eff9e4;
+      animation: ratePop .28s ease;
+    }
+    .dynamic-rate .zero { color: #8a9692; background: #eef2f0; }
+    @keyframes ratePop { from { opacity: .35; transform: translateY(4px) scale(.96); } }
+    .table-note { display: flex; align-items: center; gap: 9px; padding: 14px 20px; border-top: 1px solid var(--line); color: #6c7975; background: #fafcfb; font-size: .78rem; }
+    .table-note svg { flex: 0 0 auto; width: 17px; height: 17px; color: #5f754c; }
+    .conditions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 20px; }
+    .condition { display: flex; gap: 13px; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: rgba(255,255,255,.7); }
+    .condition-icon { flex: 0 0 auto; width: 31px; height: 31px; display: grid; place-items: center; border-radius: 9px; color: #4c6a39; background: #e8f9d4; }
+    .condition-icon svg { width: 16px; height: 16px; }
+    .condition strong { display: block; margin-bottom: 3px; font-size: .83rem; }
+    .condition span { display: block; color: #73807c; font-size: .76rem; line-height: 1.45; }
+
+    /* Publisher Gift */
+    .gift { padding: 118px 0; background: white; }
+    .gift-grid { display: grid; grid-template-columns: .92fr 1.08fr; align-items: center; gap: 80px; }
+    .gift-art {
+      position: relative; min-height: 510px; padding: 50px; overflow: hidden; border-radius: var(--radius-lg);
+      color: white; background: var(--ink);
+    }
+    .gift-art::before { content: ""; position: absolute; width: 340px; height: 340px; right: -120px; top: -130px; border-radius: 50%; background: var(--purple); opacity: .28; }
+    .gift-art::after { content: ""; position: absolute; width: 260px; height: 260px; left: -140px; bottom: -150px; border-radius: 50%; background: var(--lime); opacity: .15; }
+    .gift-percentage { position: relative; z-index: 1; width: fit-content; margin-top: 44px; font-size: clamp(6.2rem, 12vw, 9.6rem); font-weight: 900; line-height: .85; letter-spacing: -.1em; color: var(--lime); filter: drop-shadow(0 16px 35px rgba(200,255,98,.13)); }
+    .gift-percentage::after {
+      content: ""; position: absolute; width: 168px; height: 168px; right: -78px; top: -47px; z-index: -1;
+      border: 1px solid rgba(200,255,98,.22); border-radius: 50%; box-shadow: 0 0 0 24px rgba(200,255,98,.035), 0 0 0 49px rgba(200,255,98,.02);
+      animation: pulseRing 4s ease-in-out infinite;
+    }
+    @keyframes pulseRing { 50% { transform: scale(1.08); opacity: .55; } }
+    .gift-percentage sup { font-size: .32em; vertical-align: top; letter-spacing: -.03em; }
+    .gift-art h3 { position: relative; z-index: 1; max-width: 330px; margin: 31px 0 11px; font-size: 1.65rem; }
+    .gift-art p { position: relative; z-index: 1; max-width: 340px; color: #9eb0aa; font-size: .9rem; }
+    .gift-chip { position: absolute; right: 27px; bottom: 29px; z-index: 2; padding: 12px 15px; border-radius: 11px; color: var(--ink); background: white; font-size: .72rem; font-weight: 850; transform: rotate(-3deg); }
+    .gift-copy h2 { max-width: 590px; }
+    .gift-copy > p { color: var(--muted); font-size: 1.02rem; }
+    .gift-steps { display: grid; gap: 12px; margin: 31px 0 29px; }
+    .gift-step { display: flex; align-items: center; gap: 15px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+    .step-number { flex: 0 0 auto; width: 36px; height: 36px; display: grid; place-items: center; border-radius: 10px; color: var(--ink); background: var(--lime); font-size: .76rem; font-weight: 900; }
+    .gift-step strong { display: block; margin-bottom: 2px; font-size: .92rem; }
+    .gift-step span { display: block; color: var(--muted); font-size: .8rem; }
+    .requirements-pill { display: flex; flex-wrap: wrap; gap: 8px; }
+    .requirements-pill span { padding: 8px 11px; border-radius: 8px; color: #4e5e59; background: #eff4f1; font-size: .73rem; font-weight: 750; }
+
+    /* Support */
+    .support { padding: 118px 0; color: white; background: #0e201c; overflow: hidden; }
+    .support::before {
+      content: ""; position: absolute; inset: 0; opacity: .06;
+      background-image: radial-gradient(circle, white 1px, transparent 1px); background-size: 24px 24px;
+    }
+    .support-grid { position: relative; display: grid; grid-template-columns: .8fr 1.2fr; gap: 85px; }
+    .support .eyebrow { color: #b9c8c3; }
+    .support-copy h2 { max-width: 480px; }
+    .support-copy > p { max-width: 470px; color: #99aaa5; }
+    .support-channels { display: grid; gap: 11px; margin-top: 35px; }
+    .channel {
+      display: flex; align-items: center; gap: 14px; max-width: 390px; padding: 14px;
+      border: 1px solid rgba(255,255,255,.1); border-radius: 13px; background: rgba(255,255,255,.04);
+      transition: border-color .2s ease, background .2s ease, transform .2s ease;
+    }
+    .channel:hover { transform: translateX(4px); background: rgba(255,255,255,.075); border-color: rgba(255,255,255,.2); }
+    .channel-icon { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 11px; color: var(--ink); background: var(--lime); }
+    .channel:nth-child(2) .channel-icon { background: #8fd7ff; }
+    .channel-icon svg { width: 21px; height: 21px; }
+    .channel strong { display: block; font-size: .84rem; }
+    .channel span { display: block; color: #8fa19c; font-size: .74rem; }
+    .channel .arrow { width: 18px; height: 18px; margin-left: auto; color: #879a94; }
+    .contact-card { padding: 32px; border-radius: 22px; color: var(--ink); background: white; box-shadow: 0 30px 80px rgba(0,0,0,.18); }
+    .contact-card h3 { margin-bottom: 7px; font-size: 1.35rem; }
+    .contact-card > p { margin-bottom: 23px; color: var(--muted); font-size: .82rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .field { margin-bottom: 14px; }
+    .field label { display: block; margin: 0 0 7px 2px; color: #4d5d58; font-size: .72rem; font-weight: 800; }
+    .field input, .field textarea, .field select {
+      width: 100%; border: 1px solid #d8e1dc; border-radius: 10px; color: var(--ink); background: #f8faf9; transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+    .field input, .field select { height: 48px; padding: 0 13px; }
+    .field textarea { min-height: 118px; padding: 12px 13px; resize: vertical; }
+    .field input:focus, .field textarea:focus, .field select:focus { outline: none; border-color: var(--purple); background: white; box-shadow: 0 0 0 3px rgba(143,124,255,.12); }
+    .contact-submit { width: 100%; }
+    .contact-status { display: none; margin: 14px 0 0; padding: 10px 12px; border-radius: 9px; color: #2f6a47; background: #e6f8ed; font-size: .78rem; font-weight: 700; }
+    .contact-status.show { display: block; }
+    .contact-status.error { color: #9a3139; background: #fff0f1; }
+
+    /* CTA and Footer */
+    .prefooter { position: relative; padding: 78px 0; overflow: hidden; color: var(--ink); background: var(--lime); }
+    .prefooter::before, .prefooter::after { content: ""; position: absolute; border: 1px solid rgba(7,21,19,.13); border-radius: 50%; }
+    .prefooter::before { width: 240px; height: 240px; left: -105px; top: -150px; box-shadow: 0 0 0 42px rgba(7,21,19,.035); }
+    .prefooter::after { width: 330px; height: 330px; right: 17%; bottom: -290px; box-shadow: 0 0 0 62px rgba(7,21,19,.025); }
+    .prefooter-wrap { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 36px; }
+    .prefooter h2 { max-width: 650px; margin: 0; font-size: clamp(2rem, 4vw, 3.5rem); }
+    .prefooter p { max-width: 390px; margin: 7px 0 0; color: #3e5248; }
+    .prefooter .btn-dark { min-width: 180px; }
+    .footer { padding: 65px 0 24px; color: #c8d4d0; background: var(--ink); }
+    .footer-grid { display: grid; grid-template-columns: 1.6fr repeat(3, 1fr); gap: 50px; padding-bottom: 50px; }
+    .footer-brand p { max-width: 330px; margin: 18px 0 0; color: #80938d; font-size: .84rem; }
+    .footer h3 { margin: 6px 0 17px; color: white; font-size: .8rem; letter-spacing: .03em; }
+    .footer-links { display: grid; gap: 11px; }
+    .footer-links a { width: fit-content; color: #879993; font-size: .8rem; transition: color .2s ease; }
+    .footer-links a:hover { color: var(--lime); }
+    .footer-bottom { display: flex; justify-content: space-between; gap: 20px; padding-top: 23px; border-top: 1px solid rgba(255,255,255,.08); color: #6f837c; font-size: .74rem; }
+    .footer-legal { display: flex; gap: 19px; }
+    .footer-legal a:hover { color: white; }
+
+    .reveal { opacity: 0; transform: translateY(22px); transition: opacity .65s ease, transform .65s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    @media (max-width: 1040px) {
+      .nav-links { gap: 18px; }
+      .nav-links a { font-size: .82rem; }
+      .hero-grid { grid-template-columns: 1fr .78fr; gap: 30px; }
+      .visual-card { left: 5px; }
+      .floating-stat { right: 0; }
+      .gift-grid { gap: 48px; }
+      .support-grid { gap: 45px; }
+    }
+    @media (max-width: 900px) {
+      .site-header { padding: 11px 0; }
+      .nav-wrap { gap: 12px; }
+      .menu-toggle { display: grid; margin-left: auto; }
+      .nav-links, .auth-actions {
+        position: fixed; left: 20px; right: 20px; display: none; z-index: 102;
+        background: #102521; border: 1px solid rgba(255,255,255,.1);
+      }
+      .nav-links {
+        top: 78px; margin: 0; padding: 18px; border-radius: 16px 16px 8px 8px;
+        align-items: stretch; flex-direction: column; gap: 2px;
+      }
+      .nav-links a { padding: 11px; border-radius: 8px; font-size: .9rem; }
+      .nav-links a:hover { background: rgba(255,255,255,.05); }
+      .auth-actions { top: 370px; padding: 14px 18px 18px; border-top: 0; border-radius: 8px 8px 16px 16px; }
+      .auth-actions .btn { flex: 1; }
+      body.menu-open .nav-links, body.menu-open .auth-actions { display: flex; }
+      .hero { padding-top: 148px; }
+      .hero-grid { grid-template-columns: 1fr; }
+      .hero-copy { text-align: center; }
+      .hero h1, .hero-copy > p, .code-panel { margin-left: auto; margin-right: auto; }
+      .hero-proof { justify-content: center; }
+      .hero-search-action { margin-left: auto; margin-right: auto; }
+      .hero-visual { width: min(100%, 520px); min-height: 465px; margin: 10px auto 0; }
+      .visual-card { left: 40px; }
+      .signal-shell { grid-template-columns: repeat(2, 1fr); }
+      .signal-item:nth-child(2)::after { display: none; }
+      .signal-item:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+      .feature-grid { grid-template-columns: repeat(2, 1fr); }
+      .feature-card, .feature-card:nth-child(n) { grid-column: span 1; }
+      .earnings-top { align-items: stretch; flex-direction: column; }
+      .level-picker { width: 100%; }
+      .conditions { grid-template-columns: 1fr; }
+      .gift-grid, .support-grid { grid-template-columns: 1fr; }
+      .gift-art { width: min(100%, 590px); margin-inline: auto; }
+      .gift-copy { max-width: 680px; }
+      .support-copy { max-width: 670px; }
+      .support-channels { grid-template-columns: 1fr 1fr; }
+      .channel { max-width: none; }
+      .footer-grid { grid-template-columns: 1.4fr 1fr 1fr; }
+      .footer-brand { grid-column: 1 / -1; }
+    }
+    @media (max-width: 640px) {
+      .container { width: min(calc(100% - 28px), var(--max)); }
+      .brand-mark { width: 36px; height: 36px; }
+      .hero { min-height: auto; padding: 128px 0 78px; }
+      .hero h1 { font-size: clamp(2.75rem, 14vw, 4.6rem); }
+      .code-panel { padding: 7px; flex-direction: column; }
+      .code-input-wrap, .unlock-btn { width: 100%; }
+      .hero-proof { gap: 10px 16px; }
+      .hero-search-button { width: 100%; }
+      .hero-search-button span { margin-left: auto; }
+      .hero-visual { min-height: 380px; }
+      .orbit { width: 340px; height: 340px; right: -30px; }
+      .visual-card { left: 0; top: 43px; width: calc(100% - 22px); padding: 20px; }
+      .visual-code span { width: 42px; height: 51px; }
+      .floating-stat { right: 0; bottom: 21px; width: 162px; }
+      .floating-shield { left: 2px; bottom: 5px; }
+      .code-float { display: none; }
+      .signal-strip { margin-top: -26px; }
+      .signal-item { padding: 18px 16px; }
+      .signal-item strong { font-size: 1.27rem; }
+      .signal-item small { font-size: .63rem; }
+      .features, .earnings, .gift, .support { padding: 85px 0; }
+      .section-heading { margin-bottom: 32px; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .feature-card { min-height: 235px; }
+      .feature-icon { margin-bottom: 32px; }
+      .level-track { grid-template-columns: repeat(3, 1fr); }
+      .level-summary { grid-template-columns: 1fr; }
+      .summary-item { padding: 16px 18px; }
+      .rate-toolbar { align-items: stretch; flex-direction: column; padding: 15px; }
+      .rate-toolbar-title { min-width: 0; }
+      .rate-filters { width: 100%; }
+      .country-search input { min-width: 0; }
+      .tier-filter { width: 108px; }
+      .gift-art { min-height: 440px; padding: 34px 25px; }
+      .gift-percentage { margin-top: 55px; font-size: 7rem; }
+      .gift-chip { right: 17px; bottom: 18px; }
+      .support-channels { grid-template-columns: 1fr; }
+      .contact-card { padding: 23px 18px; }
+      .form-row { grid-template-columns: 1fr; gap: 0; }
+      .prefooter-wrap { align-items: flex-start; flex-direction: column; }
+      .prefooter .btn-dark { width: 100%; }
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 35px 22px; }
+      .footer-brand { grid-column: 1 / -1; }
+      .footer-bottom { align-items: flex-start; flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+      .reveal { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+  <header class="site-header" id="siteHeader">
+    <div class="container nav-wrap">
+      <a class="brand" href="#home" aria-label="LinkCode home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 14.5l5-5"/><path d="M7.2 17.8l-1 1a3.5 3.5 0 01-5-5l4-4a3.5 3.5 0 015 0"/><path d="M16.8 6.2l1-1a3.5 3.5 0 015 5l-4 4a3.5 3.5 0 01-5 0"/></svg>
+        </span>
+        <span class="brand-name">LinkCode</span>
+      </a>
+
+      <nav class="nav-links" id="mainNav" aria-label="Main navigation">
+        <a class="active" href="#home">Home</a>
+        <a href="#features">Features</a>
+        <a href="./Search.html">Search</a>
+        <a href="#earnings">Earnings</a>
+        <a href="#publisher-gift">Publisher Gift</a>
+        <a href="#support">Support</a>
+      </nav>
+
+      <div class="auth-actions" aria-label="Account actions">
+        <a class="btn btn-ghost auth-guest" href="./Login.html">Log in</a>
+        <a class="btn btn-lime auth-guest" href="./Register.html">Get started</a>
+        <a class="btn btn-lime auth-logged" href="./Dashboard.html">Dashboard</a>
+        <button class="btn btn-ghost auth-logged" id="logoutBtn" type="button">Log out</button>
+      </div>
+
+      <button class="menu-toggle" id="menuToggle" type="button" aria-label="Open navigation" aria-controls="mainNav" aria-expanded="false">
+        <svg class="menu-open-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="hero-ambient" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <div class="hero-badge"><span class="pulse"></span> Fast, secure link access</div>
+          <h1>One code.<br><span>Any destination.</span></h1>
+          <p>Turn long, forgettable links into short numeric codes. Enter a code below to unlock the destination in seconds.</p>
+
+          <form id="codeForm" novalidate>
+            <div class="code-panel">
+              <div class="code-input-wrap">
+                <svg class="code-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M8 9h.01M12 9h.01M16 9h.01M8 14h.01M12 14h4"/></svg>
+                <label class="sr-only" for="linkCode">Numeric link code</label>
+                <input class="code-input" id="linkCode" name="code" type="text" inputmode="numeric" pattern="[0-9]{6}" minlength="6" maxlength="6" autocomplete="off" placeholder="Enter your 6-digit code" aria-describedby="codeMessage">
+              </div>
+              <button class="btn btn-dark unlock-btn" type="submit">
+                Unlock link
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </button>
+            </div>
+            <p class="form-message" id="codeMessage" role="alert" aria-live="polite"></p>
+          </form>
+
+          <div class="hero-search-action">
+            <a class="hero-search-button" href="./Search.html">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+              Search public links
+              <span>Explore trending posts</span>
+            </a>
+          </div>
+
+          <div class="hero-proof" aria-label="Service highlights">
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Numbers only</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Secure verification</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Instant routing</span>
+          </div>
+        </div>
+
+        <div class="hero-visual" aria-hidden="true">
+          <div class="orbit"></div>
+          <div class="visual-card">
+            <div class="visual-top">
+              <span class="visual-label">Link access code</span>
+              <span class="live-pill">● LIVE</span>
+            </div>
+            <div class="visual-code"><span>3</span><span>7</span><span>4</span><span>9</span><span>2</span></div>
+            <div class="visual-route">
+              <div class="route-row">
+                <span class="route-node"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10 13a5 5 0 007.5.5l2-2a5 5 0 00-7-7l-1.1 1"/><path d="M14 11a5 5 0 00-7.5-.5l-2 2a5 5 0 007 7l1.1-1"/></svg></span>
+                <span class="route-text"><strong>Destination found</strong><span>Ready for secure verification</span></span>
+                <svg class="route-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </div>
+            </div>
+          </div>
+          <div class="floating-stat"><small>Current level</small><strong>LV3 ×3</strong><span>3x base payout active</span></div>
+          <div class="floating-shield"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div>
+          <div class="code-float one">CODE 84106</div>
+          <div class="code-float two">VALID VISIT</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="signal-strip" aria-label="LinkCode highlights">
+      <div class="container">
+        <div class="signal-shell reveal">
+          <div class="signal-item"><strong>24<span>h</span></strong><small>UNIQUE VISIT WINDOW</small></div>
+          <div class="signal-item"><strong>5<span>×</span></strong><small>MAXIMUM RATE LEVEL</small></div>
+          <div class="signal-item"><strong>25<span>%</span></strong><small>MAX PUBLISHER GIFT</small></div>
+          <div class="signal-item"><strong>4</strong><small>GLOBAL COUNTRY TIERS</small></div>
+        </div>
+      </div>
+    </div>
+
+    <section class="features" id="features">
+      <div class="container">
+        <div class="section-heading center reveal">
+          <p class="eyebrow">Built for better links</p>
+          <h2>Simple for visitors.<br>Powerful for publishers.</h2>
+          <p>Everything you need to share, manage, protect, and monetize links—without making access complicated.</p>
+        </div>
+
+        <div class="feature-grid">
+          <article class="feature-card feature-lime reveal">
+            <span class="feature-number">01</span>
+            <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M8 9h.01M12 9h.01M16 9h.01M8 14h.01M12 14h4"/></svg></div>
+            <h3>Memorable codes</h3>
+            <p>Replace long URLs with clean, numeric codes that are quick to share and easy to enter.</p>
+          </article>
+          <article class="feature-card feature-dark reveal">
+            <span class="feature-number">02</span>
+            <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div>
+            <h3>Protected traffic</h3>
+            <p>Built-in checks help identify VPNs, proxies, duplicate traffic, and incomplete unlocks.</p>
+          </article>
+          <article class="feature-card reveal">
+            <span class="feature-number">03</span>
+            <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V9M10 19V5M16 19v-7M22 19V2"/></svg></div>
+            <h3>Level-based earnings</h3>
+            <p>Grow your account’s total valid traffic to unlock link levels and rates up to five times higher.</p>
+          </article>
+          <article class="feature-card reveal">
+            <span class="feature-number">04</span>
+            <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 9.5c0-1.1 1.3-2 3-2s3 .9 3 2-1.3 2-3 2-3 .9-3 2 1.3 2 3 2 3-.9 3-2"/></svg></div>
+            <h3>Global payouts</h3>
+            <p>Transparent country-tier rates make it easy to understand the value of every valid visit.</p>
+          </article>
+          <article class="feature-card reveal">
+            <span class="feature-number">05</span>
+            <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12v8H4v-8M2 7h20v5H2zM12 20V7M12 7H7.5A2.5 2.5 0 117 2c3.5 0 5 5 5 5zM12 7h4.5a2.5 2.5 0 10.5-5c-3.5 0-5 5-5 5z"/></svg></div>
+            <h3>Publisher Gift</h3>
+            <p>Share up to 25% of visit earnings with registered visitors on eligible LV3+ links.</p>
+          </article>
+          <article class="feature-card reveal">
+            <span class="feature-number">06</span>
+            <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 17l6-6 4 4 6-8"/><path d="M15 7h5v5"/></svg></div>
+            <h3>Clear analytics</h3>
+            <p>Track visits by country, member source, link engagement, reports, and earnings.</p>
+          </article>
+          <article class="feature-card feature-dark reveal">
+            <span class="feature-number">07</span>
+            <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0M19 5v6M16 8h6"/></svg></div>
+            <h3>Public profiles & follows</h3>
+            <p>Build a publisher profile, grow followers, and share every public link with your community.</p>
+          </article>
+          <article class="feature-card reveal">
+            <span class="feature-number">08</span>
+            <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v12H8l-4 4V5z"/><path d="M8 9h8M8 13h5"/></svg></div>
+            <h3>Messages & notifications</h3>
+            <p>Message followed publishers, contact support, and receive real-time account notifications.</p>
+          </article>
+          <article class="feature-card feature-lime reveal">
+            <span class="feature-number">09</span>
+            <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4M11 7v8M7 11h8"/></svg></div>
+            <h3>Trending discovery</h3>
+            <p>Find useful public links by title, description, tags, level, visits, or current trend score.</p>
+          </article>
+          <article class="feature-card reveal">
+            <span class="feature-number">10</span>
+            <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 10h18M7 15h3"/></svg></div>
+            <h3>Flexible payouts</h3>
+            <p>Configure PayPal, Stripe, Western Union, or Wise after reaching the $50 payout threshold.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="earnings" id="earnings">
+      <div class="container">
+        <div class="earnings-top reveal">
+          <div class="section-heading">
+            <p class="eyebrow">Earnings calculator</p>
+            <h2>More valid visits.<br>Higher rewards.</h2>
+            <p>Total valid account visits unlock each level. Select a level to preview its rates.</p>
+          </div>
+          <div class="level-picker">
+            <label for="levelSelect">Preview link level</label>
+            <div class="select-wrap">
+              <select class="level-select" id="levelSelect">
+                <option value="0">LV0 — No earnings</option>
+                <option value="1" selected>LV1 — Base rate ×1</option>
+                <option value="2">LV2 — Base rate ×2</option>
+                <option value="3">LV3 — Base rate ×3</option>
+                <option value="4">LV4 — Base rate ×4</option>
+                <option value="5">LV5 — Base rate ×5</option>
+              </select>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="level-track reveal" aria-label="Choose a link level">
+          <button class="level-btn" type="button" data-level="0"><strong>LV0</strong><span>New link</span></button>
+          <button class="level-btn active" type="button" data-level="1"><strong>LV1</strong><span>10 visits</span></button>
+          <button class="level-btn" type="button" data-level="2"><strong>LV2</strong><span>100 visits</span></button>
+          <button class="level-btn" type="button" data-level="3"><strong>LV3</strong><span>1K visits</span></button>
+          <button class="level-btn" type="button" data-level="4"><strong>LV4</strong><span>10K visits</span></button>
+          <button class="level-btn" type="button" data-level="5"><strong>LV5</strong><span>100K visits</span></button>
+        </div>
+
+        <div class="level-summary reveal" aria-live="polite">
+          <div class="summary-item"><small>Earning status</small><strong id="earningStatus" class="earning">Active</strong></div>
+          <div class="summary-item"><small>Rate multiplier</small><strong id="multiplierValue"><em>×1</em> base rate</strong></div>
+          <div class="summary-item"><small>Total account visits required</small><strong id="visitsValue">10 visits</strong></div>
+        </div>
+
+        <div class="table-shell reveal">
+          <div class="rate-toolbar">
+            <div class="rate-toolbar-title">
+              <span class="rate-toolbar-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18M12 3a14 14 0 000 18"/></svg>
+              </span>
+              <span><strong>Country payout rates</strong><span id="countryCount">43 destinations</span></span>
+            </div>
+            <div class="rate-filters">
+              <label class="country-search">
+                <span class="sr-only">Search for a country</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+                <input id="countrySearch" type="search" placeholder="Search country..." autocomplete="off">
+              </label>
+              <label>
+                <span class="sr-only">Filter by country tier</span>
+                <select class="tier-filter" id="tierFilter">
+                  <option value="all">All tiers</option>
+                  <option value="1">Tier 1</option>
+                  <option value="2">Tier 2</option>
+                  <option value="3">Tier 3</option>
+                  <option value="4">Tier 4</option>
+                </select>
+              </label>
+            </div>
+          </div>
+          <div class="table-scroll">
+            <table class="rate-table">
+              <caption class="sr-only">Payout rates by country, flag, tier, and selected link level</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Country</th>
+                  <th scope="col">Country tier</th>
+                  <th scope="col">Base rate</th>
+                  <th scope="col">Your rate</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="country-rate-row" data-tier="1" data-country="united states us">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/us.svg" alt="United States flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>United States</strong><span>US</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-1">Tier 1</span></td>
+                  <td class="base-rate">$1.00 / visit</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="visit">$1.00 / visit</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="1" data-country="canada ca">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/ca.svg" alt="Canada flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Canada</strong><span>CA</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-1">Tier 1</span></td>
+                  <td class="base-rate">$1.00 / visit</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="visit">$1.00 / visit</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="1" data-country="united kingdom gb">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/gb.svg" alt="United Kingdom flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>United Kingdom</strong><span>GB</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-1">Tier 1</span></td>
+                  <td class="base-rate">$1.00 / visit</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="visit">$1.00 / visit</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="2" data-country="germany de">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/de.svg" alt="Germany flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Germany</strong><span>DE</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-2">Tier 2</span></td>
+                  <td class="base-rate">$1.00 / 5 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="5 visits">$1.00 / 5 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="2" data-country="france fr">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/fr.svg" alt="France flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>France</strong><span>FR</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-2">Tier 2</span></td>
+                  <td class="base-rate">$1.00 / 5 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="5 visits">$1.00 / 5 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="2" data-country="netherlands nl">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/nl.svg" alt="Netherlands flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Netherlands</strong><span>NL</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-2">Tier 2</span></td>
+                  <td class="base-rate">$1.00 / 5 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="5 visits">$1.00 / 5 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="2" data-country="belgium be">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/be.svg" alt="Belgium flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Belgium</strong><span>BE</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-2">Tier 2</span></td>
+                  <td class="base-rate">$1.00 / 5 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="5 visits">$1.00 / 5 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="2" data-country="austria at">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/at.svg" alt="Austria flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Austria</strong><span>AT</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-2">Tier 2</span></td>
+                  <td class="base-rate">$1.00 / 5 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="5 visits">$1.00 / 5 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="2" data-country="switzerland ch">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/ch.svg" alt="Switzerland flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Switzerland</strong><span>CH</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-2">Tier 2</span></td>
+                  <td class="base-rate">$1.00 / 5 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="5 visits">$1.00 / 5 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="2" data-country="ireland ie">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/ie.svg" alt="Ireland flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Ireland</strong><span>IE</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-2">Tier 2</span></td>
+                  <td class="base-rate">$1.00 / 5 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="5 visits">$1.00 / 5 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="2" data-country="luxembourg lu">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/lu.svg" alt="Luxembourg flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Luxembourg</strong><span>LU</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-2">Tier 2</span></td>
+                  <td class="base-rate">$1.00 / 5 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="5 visits">$1.00 / 5 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="2" data-country="sweden se">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/se.svg" alt="Sweden flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Sweden</strong><span>SE</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-2">Tier 2</span></td>
+                  <td class="base-rate">$1.00 / 5 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="5 visits">$1.00 / 5 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="2" data-country="norway no">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/no.svg" alt="Norway flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Norway</strong><span>NO</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-2">Tier 2</span></td>
+                  <td class="base-rate">$1.00 / 5 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="5 visits">$1.00 / 5 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="2" data-country="denmark dk">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/dk.svg" alt="Denmark flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Denmark</strong><span>DK</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-2">Tier 2</span></td>
+                  <td class="base-rate">$1.00 / 5 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="5 visits">$1.00 / 5 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="2" data-country="finland fi">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/fi.svg" alt="Finland flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Finland</strong><span>FI</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-2">Tier 2</span></td>
+                  <td class="base-rate">$1.00 / 5 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="5 visits">$1.00 / 5 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="2" data-country="iceland is">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/is.svg" alt="Iceland flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Iceland</strong><span>IS</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-2">Tier 2</span></td>
+                  <td class="base-rate">$1.00 / 5 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="5 visits">$1.00 / 5 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="2" data-country="italy it">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/it.svg" alt="Italy flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Italy</strong><span>IT</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-2">Tier 2</span></td>
+                  <td class="base-rate">$1.00 / 5 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="5 visits">$1.00 / 5 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="2" data-country="spain es">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/es.svg" alt="Spain flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Spain</strong><span>ES</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-2">Tier 2</span></td>
+                  <td class="base-rate">$1.00 / 5 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="5 visits">$1.00 / 5 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="2" data-country="portugal pt">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/pt.svg" alt="Portugal flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Portugal</strong><span>PT</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-2">Tier 2</span></td>
+                  <td class="base-rate">$1.00 / 5 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="5 visits">$1.00 / 5 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="2" data-country="greece gr">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/gr.svg" alt="Greece flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Greece</strong><span>GR</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-2">Tier 2</span></td>
+                  <td class="base-rate">$1.00 / 5 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="5 visits">$1.00 / 5 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="2" data-country="malta mt">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/mt.svg" alt="Malta flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Malta</strong><span>MT</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-2">Tier 2</span></td>
+                  <td class="base-rate">$1.00 / 5 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="5 visits">$1.00 / 5 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="2" data-country="cyprus cy">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/cy.svg" alt="Cyprus flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Cyprus</strong><span>CY</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-2">Tier 2</span></td>
+                  <td class="base-rate">$1.00 / 5 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="5 visits">$1.00 / 5 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="3" data-country="saudi arabia sa">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/sa.svg" alt="Saudi Arabia flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Saudi Arabia</strong><span>SA</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-3">Tier 3</span></td>
+                  <td class="base-rate">$1.00 / 10 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="10 visits">$1.00 / 10 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="3" data-country="united arab emirates ae">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/ae.svg" alt="United Arab Emirates flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>United Arab Emirates</strong><span>AE</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-3">Tier 3</span></td>
+                  <td class="base-rate">$1.00 / 10 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="10 visits">$1.00 / 10 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="3" data-country="qatar qa">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/qa.svg" alt="Qatar flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Qatar</strong><span>QA</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-3">Tier 3</span></td>
+                  <td class="base-rate">$1.00 / 10 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="10 visits">$1.00 / 10 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="3" data-country="kuwait kw">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/kw.svg" alt="Kuwait flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Kuwait</strong><span>KW</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-3">Tier 3</span></td>
+                  <td class="base-rate">$1.00 / 10 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="10 visits">$1.00 / 10 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="3" data-country="bahrain bh">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/bh.svg" alt="Bahrain flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Bahrain</strong><span>BH</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-3">Tier 3</span></td>
+                  <td class="base-rate">$1.00 / 10 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="10 visits">$1.00 / 10 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="3" data-country="oman om">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/om.svg" alt="Oman flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Oman</strong><span>OM</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-3">Tier 3</span></td>
+                  <td class="base-rate">$1.00 / 10 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="10 visits">$1.00 / 10 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="3" data-country="poland pl">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/pl.svg" alt="Poland flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Poland</strong><span>PL</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-3">Tier 3</span></td>
+                  <td class="base-rate">$1.00 / 10 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="10 visits">$1.00 / 10 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="3" data-country="czech republic cz">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/cz.svg" alt="Czech Republic flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Czech Republic</strong><span>CZ</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-3">Tier 3</span></td>
+                  <td class="base-rate">$1.00 / 10 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="10 visits">$1.00 / 10 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="3" data-country="hungary hu">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/hu.svg" alt="Hungary flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Hungary</strong><span>HU</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-3">Tier 3</span></td>
+                  <td class="base-rate">$1.00 / 10 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="10 visits">$1.00 / 10 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="3" data-country="romania ro">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/ro.svg" alt="Romania flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Romania</strong><span>RO</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-3">Tier 3</span></td>
+                  <td class="base-rate">$1.00 / 10 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="10 visits">$1.00 / 10 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="3" data-country="bulgaria bg">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/bg.svg" alt="Bulgaria flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Bulgaria</strong><span>BG</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-3">Tier 3</span></td>
+                  <td class="base-rate">$1.00 / 10 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="10 visits">$1.00 / 10 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="3" data-country="croatia hr">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/hr.svg" alt="Croatia flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Croatia</strong><span>HR</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-3">Tier 3</span></td>
+                  <td class="base-rate">$1.00 / 10 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="10 visits">$1.00 / 10 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="3" data-country="slovenia si">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/si.svg" alt="Slovenia flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Slovenia</strong><span>SI</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-3">Tier 3</span></td>
+                  <td class="base-rate">$1.00 / 10 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="10 visits">$1.00 / 10 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="3" data-country="slovakia sk">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/sk.svg" alt="Slovakia flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Slovakia</strong><span>SK</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-3">Tier 3</span></td>
+                  <td class="base-rate">$1.00 / 10 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="10 visits">$1.00 / 10 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="3" data-country="estonia ee">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/ee.svg" alt="Estonia flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Estonia</strong><span>EE</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-3">Tier 3</span></td>
+                  <td class="base-rate">$1.00 / 10 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="10 visits">$1.00 / 10 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="3" data-country="latvia lv">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/lv.svg" alt="Latvia flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Latvia</strong><span>LV</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-3">Tier 3</span></td>
+                  <td class="base-rate">$1.00 / 10 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="10 visits">$1.00 / 10 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="3" data-country="lithuania lt">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/lt.svg" alt="Lithuania flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Lithuania</strong><span>LT</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-3">Tier 3</span></td>
+                  <td class="base-rate">$1.00 / 10 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="10 visits">$1.00 / 10 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="3" data-country="singapore sg">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/sg.svg" alt="Singapore flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Singapore</strong><span>SG</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-3">Tier 3</span></td>
+                  <td class="base-rate">$1.00 / 10 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="10 visits">$1.00 / 10 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="3" data-country="indonesia id">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/id.svg" alt="Indonesia flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Indonesia</strong><span>ID</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-3">Tier 3</span></td>
+                  <td class="base-rate">$1.00 / 10 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="10 visits">$1.00 / 10 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="3" data-country="malaysia my">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/my.svg" alt="Malaysia flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>Malaysia</strong><span>MY</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-3">Tier 3</span></td>
+                  <td class="base-rate">$1.00 / 10 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="10 visits">$1.00 / 10 visits</td>
+                </tr>
+                <tr class="country-rate-row" data-tier="4" data-country="all other countries intl">
+                  <td>
+                    <div class="country-cell">
+                      <img class="country-flag" src="./assets/flags/world.svg" alt="All Other Countries flag" loading="lazy" width="42" height="30">
+                      <span class="country-meta"><strong>All Other Countries</strong><span>INTL</span></span>
+                    </div>
+                  </td>
+                  <td class="tier-cell"><span class="tier-tag tier-4">Tier 4</span></td>
+                  <td class="base-rate">$1.00 / 50 visits</td>
+                  <td class="dynamic-rate" data-base="1" data-unit="50 visits">$1.00 / 50 visits</td>
+                </tr>
+                <tr class="no-country-results" id="noCountryResults" hidden>
+                  <td colspan="4">No country matches your search.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-note">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+            Rates shown are calculated from the base rate multiplied by the selected link level.
+          </div>
+        </div>
+
+        <div class="conditions reveal" aria-label="Earning conditions">
+          <div class="condition">
+            <span class="condition-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M20 6L9 17l-5-5"/></svg></span>
+            <div><strong>Valid traffic only</strong><span>The visit must be real, fully completed, and free from VPN or proxy use.</span></div>
+          </div>
+          <div class="condition">
+            <span class="condition-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+            <div><strong>Unique within 24 hours</strong><span>One valid visit per IP address, per code, during each 24-hour period.</span></div>
+          </div>
+          <div class="condition">
+            <span class="condition-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 20V10M12 20V4M19 20v-7"/></svg></span>
+            <div><strong>LV1 or higher</strong><span>Reach 10 total valid account visits to unlock LV1 when creating a link.</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="gift" id="publisher-gift">
+      <div class="container gift-grid">
+        <div class="gift-art reveal" aria-hidden="true">
+          <div class="visual-label">Publisher Gift</div>
+          <div class="gift-percentage">25<sup>%</sup></div>
+          <h3>Give a little back. Build a stronger audience.</h3>
+          <p>You choose the reward percentage from your dashboard.</p>
+          <div class="gift-chip">LV3+ FEATURE</div>
+        </div>
+        <div class="gift-copy reveal">
+          <p class="eyebrow">Reward your community</p>
+          <h2>Share your success with every unlock.</h2>
+          <p>Publisher Gift lets you allocate a percentage of an eligible link’s visit earnings to registered visitors. You stay in control and choose when the feature is active.</p>
+          <div class="gift-steps">
+            <div class="gift-step">
+              <span class="step-number">01</span>
+              <div><strong>Enable it from the dashboard</strong><span>The publisher must actively switch on the gift for each eligible link.</span></div>
+            </div>
+            <div class="gift-step">
+              <span class="step-number">02</span>
+              <div><strong>Set your gift percentage</strong><span>Choose any share up to a maximum of 25% of the valid visit earnings.</span></div>
+            </div>
+            <div class="gift-step">
+              <span class="step-number">03</span>
+              <div><strong>Reward verified members</strong><span>Only signed-in visitors can receive the Publisher Gift.</span></div>
+            </div>
+          </div>
+          <div class="requirements-pill" aria-label="Publisher Gift requirements">
+            <span>LV3 or higher</span><span>Registered visitors only</span><span>Maximum 25%</span><span>Publisher controlled</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="support" id="support">
+      <div class="container support-grid">
+        <div class="support-copy reveal">
+          <p class="eyebrow">Support &amp; contact</p>
+          <h2>Questions? We’re here to help.</h2>
+          <p>Send our team a message or reach out through your preferred support channel. We’ll help with account, link, traffic, or payout questions.</p>
+          <div class="support-channels">
+            <a class="channel" href="#contactForm" aria-label="Contact support through WhatsApp">
+              <span class="channel-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M20.5 11.6a8.5 8.5 0 01-12.6 7.5L3 20.5l1.4-4.7A8.5 8.5 0 1120.5 11.6z"/><path d="M8.3 7.7c.2-.4.4-.4.7-.4h.4c.2 0 .4.1.5.4l.8 1.8c.1.3 0 .5-.2.7l-.6.7c-.2.2-.1.4 0 .6.6 1.1 1.5 2 2.6 2.6.2.1.4.2.6 0l.8-1c.2-.2.4-.3.7-.2l1.9.9c.3.1.4.3.4.5 0 .3-.2 1.5-1.1 2.1-.5.4-1.3.6-2.2.3-1.1-.3-2.5-.8-4.2-2.3-1.4-1.2-2.4-2.8-2.7-3.7-.7-1.8 0-2.7.6-3z"/></svg></span>
+              <span><strong>WhatsApp Support</strong><span>Quick help from our team</span></span>
+              <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+            <a class="channel" href="#contactForm" aria-label="Contact support through Telegram">
+              <span class="channel-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M21 3L3.8 9.6c-1.2.5-1.2 1.1-.2 1.4l4.4 1.4 1.7 5.1c.2.7.1 1 .8 1 .5 0 .7-.2 1-.5l2.1-2 4.5 3.3c.8.5 1.4.3 1.6-.8L22.6 5c.3-1.3-.5-1.9-1.6-1.5z"/><path d="M8 12.4L19.5 5.3c.6-.4 1.1-.2.7.2l-9.5 8.6-.4 4.1"/></svg></span>
+              <span><strong>Telegram Support</strong><span>Message our support channel</span></span>
+              <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <form class="contact-card reveal" id="contactForm">
+          <h3>Send a support request</h3>
+          <p>Complete the form and our team will get back to you.</p>
+          <div class="form-row">
+            <div class="field">
+              <label for="contactName">Full name</label>
+              <input id="contactName" name="name" type="text" autocomplete="name" placeholder="Your name" required>
+            </div>
+            <div class="field">
+              <label for="contactEmail">Email address</label>
+              <input id="contactEmail" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+            </div>
+          </div>
+          <div class="field">
+            <label for="contactTopic">How can we help?</label>
+            <select id="contactTopic" name="topic">
+              <option>Link or code issue</option>
+              <option>Account support</option>
+              <option>Visits and earnings</option>
+              <option>Payout question</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="contactMessage">Message</label>
+            <textarea id="contactMessage" name="message" placeholder="Tell us what happened..." required></textarea>
+          </div>
+          <button class="btn btn-dark contact-submit" type="submit">Send request</button>
+          <p class="contact-status" id="contactStatus" role="status">Thanks! Your request has been prepared for the support team.</p>
+        </form>
+      </div>
+    </section>
+
+    <section class="prefooter" aria-label="Get started">
+      <div class="container prefooter-wrap reveal">
+        <div>
+          <h2>Ready to make every link count?</h2>
+          <p>Create your LinkCode account and start building shorter journeys today.</p>
+        </div>
+        <a class="btn btn-dark" href="./Register.html">Create free account</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a class="brand" href="#home" aria-label="LinkCode home">
+            <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M9.5 14.5l5-5"/><path d="M7.2 17.8l-1 1a3.5 3.5 0 01-5-5l4-4a3.5 3.5 0 015 0"/><path d="M16.8 6.2l1-1a3.5 3.5 0 015 5l-4 4a3.5 3.5 0 01-5 0"/></svg></span>
+            <span class="brand-name">LinkCode</span>
+          </a>
+          <p>Simple numeric codes for secure link access, smarter publishing, and transparent global earnings.</p>
+        </div>
+        <div>
+          <h3>Product</h3>
+          <div class="footer-links"><a href="#features">Features</a><a href="./Search.html">Search</a><a href="#earnings">Earnings</a><a href="#publisher-gift">Publisher Gift</a><a href="./Dashboard.html">Dashboard</a></div>
+        </div>
+        <div>
+          <h3>Account</h3>
+          <div class="footer-links"><a href="./Login.html">Log in</a><a href="./Register.html">Register</a><a href="#support">Support</a><a href="#support">Contact</a></div>
+        </div>
+        <div>
+          <h3>Resources</h3>
+          <div class="footer-links"><a href="#earnings">Payout rates</a><a href="#earnings">Valid visits</a><a href="#">Help center</a><a href="#">Status</a></div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© <span id="currentYear"></span> LinkCode. All rights reserved.</span>
+        <div class="footer-legal"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Cookies</a></div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (() => {
+      'use strict';
+
+      // Header behavior and mobile navigation
+      const header = document.getElementById('siteHeader');
+      const scrollProgress = document.getElementById('scrollProgress');
+      const menuToggle = document.getElementById('menuToggle');
+      const navLinks = [...document.querySelectorAll('.nav-links a')];
+
+      const updateScrollUI = () => {
+        header.classList.toggle('scrolled', window.scrollY > 18);
+        const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0;
+        scrollProgress.style.width = `${Math.min(progress, 100)}%`;
+      };
+      updateScrollUI();
+      window.addEventListener('scroll', updateScrollUI, { passive: true });
+
+      menuToggle.addEventListener('click', () => {
+        const open = document.body.classList.toggle('menu-open');
+        menuToggle.setAttribute('aria-expanded', String(open));
+        menuToggle.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
+      });
+      navLinks.forEach(link => link.addEventListener('click', () => {
+        document.body.classList.remove('menu-open');
+        menuToggle.setAttribute('aria-expanded', 'false');
+      }));
+
+      // Numeric code validation and required redirect format
+      const codeForm = document.getElementById('codeForm');
+      const codeInput = document.getElementById('linkCode');
+      const codeMessage = document.getElementById('codeMessage');
+
+      codeInput.addEventListener('input', () => {
+        const digitsOnly = codeInput.value.replace(/\D/g, '');
+        if (codeInput.value !== digitsOnly) {
+          codeInput.value = digitsOnly;
+          codeMessage.textContent = 'Only numbers can be used in a LinkCode.';
+        } else {
+          codeMessage.textContent = '';
+        }
+      });
+
+      codeForm.addEventListener('submit', event => {
+        event.preventDefault();
+        const code = codeInput.value.trim();
+        if (!code) {
+          codeMessage.textContent = 'Enter a numeric code to continue.';
+          codeInput.focus();
+          return;
+        }
+        if (!/^\d{6}$/.test(code)) {
+          codeMessage.textContent = 'Your LinkCode must contain exactly six numbers.';
+          codeInput.focus();
+          return;
+        }
+        window.location.href = '/unlock?code=' + encodeURIComponent(code);
+      });
+
+      // Dynamic level-based payout calculator
+      const levels = {
+        0: { multiplier: 0, visits: 'No threshold', status: 'No earnings' },
+        1: { multiplier: 1, visits: '10 visits', status: 'Active' },
+        2: { multiplier: 2, visits: '100 visits', status: 'Active' },
+        3: { multiplier: 3, visits: '1,000 visits', status: 'Active + Gift eligible' },
+        4: { multiplier: 4, visits: '10,000 visits', status: 'Active + Gift eligible' },
+        5: { multiplier: 5, visits: '100,000 visits', status: 'Active + Gift eligible' }
+      };
+      const levelSelect = document.getElementById('levelSelect');
+      const levelButtons = [...document.querySelectorAll('.level-btn')];
+      const dynamicRates = [...document.querySelectorAll('.dynamic-rate')];
+      const earningStatus = document.getElementById('earningStatus');
+      const multiplierValue = document.getElementById('multiplierValue');
+      const visitsValue = document.getElementById('visitsValue');
+
+      const renderLevel = level => {
+        const config = levels[level];
+        levelSelect.value = String(level);
+        levelButtons.forEach(button => button.classList.toggle('active', Number(button.dataset.level) === Number(level)));
+        earningStatus.textContent = config.status;
+        earningStatus.classList.toggle('earning', config.multiplier > 0);
+        multiplierValue.innerHTML = config.multiplier === 0 ? '<em>×0</em> — disabled' : `<em>×${config.multiplier}</em> base rate`;
+        visitsValue.textContent = config.visits;
+
+        dynamicRates.forEach(cell => {
+          const base = Number(cell.dataset.base);
+          const unit = cell.dataset.unit;
+          if (config.multiplier === 0) {
+            cell.innerHTML = '<span class="zero">$0.00 / visit</span>';
+          } else {
+            cell.innerHTML = `<span class="rate-pill">$${(base * config.multiplier).toFixed(2)} / ${unit}</span>`;
+          }
+        });
+      };
+
+      levelSelect.addEventListener('change', event => renderLevel(Number(event.target.value)));
+      levelButtons.forEach(button => button.addEventListener('click', () => renderLevel(Number(button.dataset.level))));
+      renderLevel(1);
+
+      // Search and filter the country payout table.
+      const countrySearch = document.getElementById('countrySearch');
+      const tierFilter = document.getElementById('tierFilter');
+      const countryRows = [...document.querySelectorAll('.country-rate-row')];
+      const countryCount = document.getElementById('countryCount');
+      const noCountryResults = document.getElementById('noCountryResults');
+
+      const filterCountries = () => {
+        const query = countrySearch.value.trim().toLowerCase();
+        const tier = tierFilter.value;
+        let visible = 0;
+
+        countryRows.forEach(row => {
+          const matchesName = row.dataset.country.includes(query);
+          const matchesTier = tier === 'all' || row.dataset.tier === tier;
+          const show = matchesName && matchesTier;
+          row.hidden = !show;
+          if (show) visible += 1;
+        });
+
+        countryCount.textContent = `${visible} ${visible === 1 ? 'destination' : 'destinations'}`;
+        noCountryResults.hidden = visible !== 0;
+      };
+
+      countrySearch.addEventListener('input', filterCountries);
+      tierFilter.addEventListener('change', filterCountries);
+
+      // Authentication-aware header. Set localStorage key "linkcode_auth" to "true" after login.
+      const syncAuthState = () => {
+        const authenticated = localStorage.getItem('linkcode_auth') === 'true' || sessionStorage.getItem('linkcode_auth') === 'true';
+        document.body.classList.toggle('is-authenticated', authenticated);
+      };
+      syncAuthState();
+      window.addEventListener('storage', syncAuthState);
+      document.getElementById('logoutBtn').addEventListener('click', () => {
+        ['linkcode_auth', 'linkcode_user', 'linkcode_session_token', 'linkcode_session_expires'].forEach(key => {
+          localStorage.removeItem(key);
+          sessionStorage.removeItem(key);
+        });
+        syncAuthState();
+        document.body.classList.remove('menu-open');
+      });
+
+      // Send visitor support messages to the unified Messages table.
+      const contactForm = document.getElementById('contactForm');
+      const contactStatus = document.getElementById('contactStatus');
+      contactForm.addEventListener('submit', async event => {
+        event.preventDefault();
+        if (!contactForm.checkValidity()) {
+          contactForm.reportValidity();
+          return;
+        }
+        const button = contactForm.querySelector('[type="submit"]');
+        button.disabled = true;
+        button.textContent = 'Sending…';
+        contactStatus.className = 'contact-status show';
+        contactStatus.textContent = 'Sending your message to LinkCode support…';
+        try {
+          const response = await fetch('https://vsafwjlosvbuonjuazxc.supabase.co/rest/v1/rpc/submit_contact_message', {
+            method: 'POST',
+            headers: {
+              apikey: 'sb_publishable_awYVK41RO6Wjq065B03S4w_qxAf8Qdn',
+              'Content-Type': 'application/json',
+              Accept: 'application/json'
+            },
+            body: JSON.stringify({
+              p_name: document.getElementById('contactName').value,
+              p_email: document.getElementById('contactEmail').value,
+              p_subject: document.getElementById('contactTopic').value,
+              p_message: document.getElementById('contactMessage').value
+            }),
+            cache: 'no-store'
+          });
+          const result = await response.json();
+          if (!response.ok || !result?.success) throw new Error(result?.reason === 'RATE_LIMITED' ? 'Too many messages. Please try again later.' : 'Unable to send your message.');
+          contactStatus.className = 'contact-status show';
+          contactStatus.textContent = 'Thanks! Your message was sent to the support team.';
+          contactForm.reset();
+        } catch (error) {
+          contactStatus.className = 'contact-status show error';
+          contactStatus.textContent = error.message || 'Unable to send your message.';
+        } finally {
+          button.disabled = false;
+          button.textContent = 'Send request';
+        }
+      });
+
+      // Interactive card lighting and a restrained 3D tilt on pointer devices.
+      if (window.matchMedia('(pointer: fine)').matches) {
+        document.querySelectorAll('.feature-card').forEach(card => {
+          card.addEventListener('pointermove', event => {
+            const rect = card.getBoundingClientRect();
+            card.style.setProperty('--mouse-x', `${event.clientX - rect.left}px`);
+            card.style.setProperty('--mouse-y', `${event.clientY - rect.top}px`);
+          });
+        });
+
+        const heroVisual = document.querySelector('.hero-visual');
+        const visualCard = document.querySelector('.visual-card');
+        heroVisual.addEventListener('pointermove', event => {
+          const rect = heroVisual.getBoundingClientRect();
+          const x = (event.clientX - rect.left) / rect.width - .5;
+          const y = (event.clientY - rect.top) / rect.height - .5;
+          visualCard.style.setProperty('--tilt-x', `${(-y * 7).toFixed(2)}deg`);
+          visualCard.style.setProperty('--tilt-y', `${(x * 9).toFixed(2)}deg`);
+        });
+        heroVisual.addEventListener('pointerleave', () => {
+          visualCard.style.setProperty('--tilt-x', '0deg');
+          visualCard.style.setProperty('--tilt-y', '0deg');
+        });
+      }
+
+      // Active navigation state
+      const sections = [...document.querySelectorAll('main section[id]')];
+      const sectionObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          navLinks.forEach(link => link.classList.toggle('active', link.getAttribute('href') === `#${entry.target.id}`));
+        });
+      }, { rootMargin: '-35% 0px -55% 0px', threshold: 0 });
+      sections.forEach(section => sectionObserver.observe(section));
+
+      // Subtle scroll reveals
+      const revealItems = document.querySelectorAll('.reveal');
+      if ('IntersectionObserver' in window) {
+        const revealObserver = new IntersectionObserver(entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              revealObserver.unobserve(entry.target);
+            }
+          });
+        }, { threshold: .1 });
+        revealItems.forEach(item => revealObserver.observe(item));
+      } else {
+        revealItems.forEach(item => item.classList.add('visible'));
+      }
+
+      document.getElementById('currentYear').textContent = new Date().getFullYear();
+    })();
+  </script>
+</body>
+</html>

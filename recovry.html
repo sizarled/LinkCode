@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Verify your LinkCode member details and securely choose a new password.">
+  <meta name="theme-color" content="#071513">
+  <title>Recover Your Account — LinkCode</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23c8ff62'/%3E%3Cpath d='M26 39l-4 4a8 8 0 01-11-11l9-9a8 8 0 0111 0' fill='none' stroke='%23071513' stroke-width='6' stroke-linecap='round'/%3E%3Cpath d='M38 25l4-4a8 8 0 0111 11l-9 9a8 8 0 01-11 0' fill='none' stroke='%23071513' stroke-width='6' stroke-linecap='round'/%3E%3Cpath d='M24 32h16' stroke='%23071513' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      --ink: #071513;
+      --surface: #fff;
+      --soft: #f2f6f3;
+      --line: #d9e4de;
+      --muted: #687772;
+      --lime: #c8ff62;
+      --lime-deep: #a7e23e;
+      --purple: #8f7cff;
+      --orange: #ff9c68;
+      --green: #367424;
+      --green-soft: #ebf9df;
+      --blue: #3d71c5;
+      --blue-soft: #edf4ff;
+      --red: #c94651;
+      --red-soft: #fff0f1;
+      --amber: #a9681e;
+      --amber-soft: #fff3e2;
+      --shadow: 0 35px 90px rgba(0,0,0,.26);
+    }
+    * { box-sizing: border-box; }
+    html { min-height: 100%; }
+    body { min-height: 100vh; margin: 0; overflow-x: hidden; color: var(--ink); background: var(--ink); font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+    ::selection { color: var(--ink); background: var(--lime); }
+    button, input { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    a { color: inherit; text-decoration: none; }
+    svg { display: block; }
+    .container { width: min(calc(100% - 40px), 1100px); margin-inline: auto; }
+    .hidden { display: none !important; }
+
+    /* Header */
+    .site-header { position: relative; z-index: 20; padding: 17px 0; border-bottom: 1px solid rgba(255,255,255,.08); background: rgba(7,21,19,.7); backdrop-filter: blur(18px); }
+    .header-wrap { min-height: 47px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; color: white; }
+    .brand-mark { width: 39px; height: 39px; display: grid; place-items: center; border-radius: 11px; color: var(--ink); background: var(--lime); box-shadow: 0 0 0 5px rgba(200,255,98,.08); }
+    .brand-mark svg { width: 23px; height: 23px; }
+    .brand-name { font-size: 1.16rem; font-weight: 850; letter-spacing: -.035em; }
+    .login-link { min-height: 41px; padding: 0 14px; display: inline-flex; align-items: center; gap: 7px; justify-content: center; border: 1px solid rgba(255,255,255,.14); border-radius: 10px; color: white; background: rgba(255,255,255,.045); font-size: .76rem; font-weight: 790; transition: transform .2s ease, background .2s ease, border-color .2s ease; }
+    .login-link:hover { transform: translateY(-2px); border-color: rgba(255,255,255,.25); background: rgba(255,255,255,.08); }
+    .login-link svg { width: 15px; height: 15px; }
+
+    /* Page */
+    .recovery-page { position: relative; min-height: calc(100vh - 82px); padding: 60px 0 82px; overflow: hidden; background: radial-gradient(circle at 83% 10%, rgba(143,124,255,.22), transparent 28%), radial-gradient(circle at 6% 76%, rgba(200,255,98,.09), transparent 24%), var(--ink); }
+    .recovery-page::before { content: ""; position: absolute; inset: 0; opacity: .11; pointer-events: none; background-image: linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px); background-size: 66px 66px; mask-image: linear-gradient(to bottom, black, transparent 92%); }
+    .recovery-page::after { content: ""; position: absolute; width: 430px; height: 430px; right: -260px; bottom: -250px; border: 1px solid rgba(200,255,98,.14); border-radius: 50%; box-shadow: 0 0 0 74px rgba(200,255,98,.022), 0 0 0 148px rgba(200,255,98,.014); }
+    .recovery-grid { position: relative; z-index: 2; display: grid; grid-template-columns: minmax(0, .82fr) minmax(440px, 1.18fr); align-items: center; gap: 78px; }
+
+    /* Story */
+    .story { color: white; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 18px; padding: 7px 11px; border: 1px solid rgba(255,255,255,.11); border-radius: 99px; color: #c5d3cf; background: rgba(255,255,255,.045); font-size: .68rem; font-weight: 820; letter-spacing: .08em; text-transform: uppercase; }
+    .eyebrow span { width: 7px; height: 7px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 0 5px rgba(200,255,98,.09); }
+    .story h1 { max-width: 570px; margin: 0 0 18px; font-size: clamp(2.8rem, 5.7vw, 5.15rem); line-height: .98; letter-spacing: -.065em; }
+    .story h1 em { color: transparent; background: linear-gradient(100deg, var(--lime), #eaffbd 46%, #88ebc4); -webkit-background-clip: text; background-clip: text; font-style: normal; }
+    .story > p { max-width: 500px; margin: 0; color: #9bada7; font-size: .93rem; }
+    .security-card { max-width: 440px; margin-top: 31px; padding: 19px; border: 1px solid rgba(255,255,255,.1); border-radius: 17px; background: rgba(255,255,255,.045); backdrop-filter: blur(10px); }
+    .security-card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; }
+    .security-icon { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 11px; color: var(--ink); background: var(--lime); }
+    .security-icon svg { width: 20px; height: 20px; }
+    .security-card-head strong { display: block; font-size: .78rem; }
+    .security-card-head span { display: block; color: #82958e; font-size: .64rem; }
+    .security-list { display: grid; gap: 9px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); }
+    .security-list span { display: flex; align-items: center; gap: 8px; color: #91a39d; font-size: .66rem; font-weight: 680; }
+    .security-list svg { width: 13px; height: 13px; color: var(--lime); }
+
+    /* Form card */
+    .form-card { position: relative; padding: 10px; border: 1px solid rgba(255,255,255,.13); border-radius: 27px; background: rgba(255,255,255,.075); box-shadow: var(--shadow); backdrop-filter: blur(20px); }
+    .form-card::before { content: ""; position: absolute; inset: 9% 13% -20px; z-index: -1; background: linear-gradient(90deg, rgba(200,255,98,.17), rgba(143,124,255,.2)); filter: blur(29px); }
+    .form-surface { min-height: 540px; padding: 33px; border-radius: 19px; background: white; }
+    .progress { display: grid; grid-template-columns: 1fr 42px 1fr; align-items: center; margin-bottom: 28px; }
+    .progress-step { display: flex; align-items: center; gap: 9px; color: #89958f; font-size: .65rem; font-weight: 780; }
+    .progress-step:last-child { justify-content: flex-end; }
+    .progress-number { width: 29px; height: 29px; display: grid; place-items: center; border: 1px solid #d9e2dd; border-radius: 9px; color: #78857f; background: var(--soft); font-size: .66rem; font-weight: 850; }
+    .progress-step.active { color: var(--ink); }
+    .progress-step.active .progress-number { color: var(--ink); border-color: var(--lime); background: var(--lime); box-shadow: 0 0 0 4px rgba(200,255,98,.16); }
+    .progress-step.done { color: var(--green); }
+    .progress-step.done .progress-number { color: var(--green); border-color: #cee7bd; background: var(--green-soft); }
+    .progress-line { height: 1px; background: #dfe7e3; }
+    .form-heading { margin-bottom: 24px; }
+    .form-heading h2 { margin: 0 0 6px; font-size: 1.55rem; line-height: 1.15; letter-spacing: -.045em; }
+    .form-heading p { margin: 0; color: var(--muted); font-size: .76rem; }
+    .field { margin-bottom: 15px; }
+    .field-label-row { display: flex; align-items: center; justify-content: space-between; margin: 0 2px 7px; }
+    .field-label-row label { color: #45554f; font-size: .7rem; font-weight: 820; }
+    .field-hint { color: #909c98; font-size: .6rem; font-weight: 700; }
+    .input-wrap { position: relative; }
+    .input-icon { position: absolute; width: 19px; height: 19px; left: 13px; top: 50%; translate: 0 -50%; color: #73817c; pointer-events: none; }
+    .field input { width: 100%; height: 52px; padding: 0 44px 0 42px; border: 1px solid #d6e0da; border-radius: 11px; color: var(--ink); background: #f7f9f8; font-size: .8rem; font-weight: 650; transition: border-color .2s ease, background .2s ease, box-shadow .2s ease; }
+    .field input::placeholder { color: #99a39f; font-weight: 550; }
+    .field input:focus { outline: none; border-color: var(--purple); background: white; box-shadow: 0 0 0 4px rgba(143,124,255,.1); }
+    .field input.invalid { border-color: var(--red); background: #fffafa; box-shadow: 0 0 0 3px rgba(201,70,81,.08); }
+    .id-input { display: flex; }
+    .id-prefix { flex: 0 0 auto; width: 53px; height: 52px; display: grid; place-items: center; border: 1px solid #d6e0da; border-right: 0; border-radius: 11px 0 0 11px; color: var(--ink); background: #eaf0ed; font: 850 .82rem/1 ui-monospace, monospace; }
+    .id-input input { border-radius: 0 11px 11px 0; padding-left: 14px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .06em; }
+    .field-error { min-height: 16px; margin: 5px 0 0 2px; color: var(--red); font-size: .62rem; font-weight: 700; }
+    .password-toggle { position: absolute; right: 7px; top: 7px; width: 38px; height: 38px; padding: 0; display: grid; place-items: center; border: 0; border-radius: 8px; color: #6d7b76; background: transparent; cursor: pointer; }
+    .password-toggle:hover { background: #e9efec; }
+    .password-toggle svg { width: 18px; height: 18px; }
+    .strength { display: none; margin-top: 8px; }
+    .strength.show { display: block; }
+    .strength-bars { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+    .strength-bars span { height: 4px; border-radius: 99px; background: #e1e8e4; }
+    .strength-bars span.active.weak { background: var(--red); }
+    .strength-bars span.active.fair { background: var(--orange); }
+    .strength-bars span.active.good { background: #d0b03e; }
+    .strength-bars span.active.strong { background: var(--lime-deep); }
+    .strength-copy { display: flex; justify-content: space-between; margin-top: 5px; color: #88958f; font-size: .59rem; font-weight: 700; }
+    .submit-button { width: 100%; min-height: 52px; margin-top: 4px; border: 0; border-radius: 11px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; color: white; background: var(--ink); font-size: .79rem; font-weight: 830; cursor: pointer; transition: transform .2s ease, background .2s ease, box-shadow .2s ease; }
+    .submit-button:hover { transform: translateY(-2px); background: #17352e; box-shadow: 0 13px 30px rgba(7,21,19,.2); }
+    .submit-button:disabled { opacity: .64; cursor: wait; transform: none; box-shadow: none; }
+    .submit-button svg { width: 17px; height: 17px; }
+    .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,.3); border-top-color: white; border-radius: 50%; animation: spin .75s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .form-foot { margin: 17px 0 0; color: #8a9792; text-align: center; font-size: .64rem; }
+    .form-foot a { color: var(--ink); font-weight: 800; }
+
+    /* Results */
+    .result-panel { display: none; margin-bottom: 19px; padding: 15px; border-radius: 13px; animation: resultIn .3s ease; }
+    .result-panel.show { display: flex; gap: 11px; }
+    @keyframes resultIn { from { opacity: 0; transform: translateY(-7px); } }
+    .result-panel.success { color: var(--green); background: var(--green-soft); }
+    .result-panel.error { color: var(--red); background: var(--red-soft); }
+    .result-panel.info { color: var(--blue); background: var(--blue-soft); }
+    .result-icon { flex: 0 0 auto; width: 35px; height: 35px; display: grid; place-items: center; border-radius: 10px; background: rgba(255,255,255,.72); }
+    .result-icon svg { width: 18px; height: 18px; }
+    .result-content strong { display: block; margin-bottom: 2px; font-size: .75rem; }
+    .result-content span { display: block; color: #64736d; font-size: .65rem; line-height: 1.45; }
+    .token-note { display: flex; align-items: center; gap: 8px; margin: 18px 0; padding: 10px 11px; border-radius: 9px; color: #697772; background: var(--soft); font-size: .63rem; font-weight: 680; }
+    .token-note svg { flex: 0 0 auto; width: 14px; height: 14px; color: var(--green); }
+    .success-state { padding: 28px 10px 10px; text-align: center; }
+    .success-icon { width: 62px; height: 62px; margin: 0 auto 17px; display: grid; place-items: center; border-radius: 18px; color: var(--green); background: var(--lime); box-shadow: 0 14px 30px rgba(167,226,62,.22); }
+    .success-icon svg { width: 29px; height: 29px; }
+    .success-state h2 { margin: 0 0 7px; font-size: 1.45rem; letter-spacing: -.04em; }
+    .success-state p { max-width: 390px; margin: 0 auto 20px; color: var(--muted); font-size: .75rem; }
+    .login-button { min-height: 46px; padding: 0 18px; display: inline-flex; align-items: center; gap: 8px; border-radius: 10px; color: white; background: var(--ink); font-size: .75rem; font-weight: 820; }
+    .login-button svg { width: 16px; height: 16px; }
+
+    @media (max-width: 920px) {
+      .recovery-grid { grid-template-columns: 1fr; gap: 44px; }
+      .story { text-align: center; }
+      .story > p, .security-card { margin-left: auto; margin-right: auto; }
+      .security-card { text-align: left; }
+      .form-card { width: min(100%, 620px); margin-inline: auto; }
+    }
+    @media (max-width: 600px) {
+      .container { width: min(calc(100% - 28px), 1100px); }
+      .site-header { padding: 13px 0; }
+      .recovery-page { min-height: calc(100vh - 66px); padding: 44px 0 64px; }
+      .story h1 { font-size: clamp(2.7rem, 14vw, 4rem); }
+      .form-card { padding: 7px; border-radius: 21px; }
+      .form-surface { min-height: 0; padding: 26px 18px; border-radius: 15px; }
+      .progress { grid-template-columns: 1fr 22px 1fr; }
+      .progress-step { font-size: .59rem; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-wrap">
+      <a class="brand" href="./index.html" aria-label="LinkCode home"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M9.5 14.5l5-5"/><path d="M7.2 17.8l-1 1a3.5 3.5 0 01-5-5l4-4a3.5 3.5 0 015 0"/><path d="M16.8 6.2l1-1a3.5 3.5 0 015 5l-4 4a3.5 3.5 0 01-5 0"/></svg></span><span class="brand-name">LinkCode</span></a>
+      <a class="login-link" href="./Login.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>Back to login</a>
+    </div>
+  </header>
+
+  <main class="recovery-page">
+    <div class="container recovery-grid">
+      <section class="story" aria-labelledby="pageTitle">
+        <div class="eyebrow"><span></span> Secure account recovery</div>
+        <h1 id="pageTitle">Reset access.<br><em>Keep moving.</em></h1>
+        <p>Verify your LinkCode member ID and email address, then choose a secure new password for your account.</p>
+        <div class="security-card">
+          <div class="security-card-head"><span class="security-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></span><span><strong>Protected reset process</strong><span>Your recovery token expires after 10 minutes.</span></span></div>
+          <div class="security-list"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>Member ID and email must match</span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>New password is stored as a bcrypt hash</span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>Existing login sessions are revoked</span></div>
+        </div>
+      </section>
+
+      <section class="form-card" aria-label="Password recovery form">
+        <div class="form-surface">
+          <div class="progress" id="progress"><div class="progress-step active" id="progressVerify"><span class="progress-number">1</span>Verify account</div><span class="progress-line"></span><div class="progress-step" id="progressPassword"><span class="progress-number">2</span>New password</div></div>
+          <div class="result-panel" id="resultPanel" role="status" aria-live="polite"><span class="result-icon" id="resultIcon"></span><span class="result-content"><strong id="resultTitle"></strong><span id="resultMessage"></span></span></div>
+
+          <section id="verifyStep">
+            <div class="form-heading"><h2>Verify your membership</h2><p>Enter the numeric part of your member ID and your registered email.</p></div>
+            <form id="verifyForm" novalidate>
+              <div class="field">
+                <div class="field-label-row"><label for="ownerNumber">Member ID</label><span class="field-hint">Enter numbers only</span></div>
+                <div class="id-input"><span class="id-prefix">ID</span><input id="ownerNumber" name="ownerNumber" type="text" inputmode="numeric" pattern="[0-9]+" maxlength="30" autocomplete="off" placeholder="1001" required></div>
+                <p class="field-error" id="ownerError"></p>
+              </div>
+              <div class="field">
+                <div class="field-label-row"><label for="email">Registered email</label><span class="field-hint">Must match your account</span></div>
+                <div class="input-wrap"><svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7l8 6 8-6"/></svg><input id="email" name="email" type="email" maxlength="254" autocomplete="email" placeholder="you@example.com" required></div>
+                <p class="field-error" id="emailError"></p>
+              </div>
+              <button class="submit-button" id="verifyButton" type="submit">Verify account <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+              <p class="form-foot">Remember your password? <a href="./Login.html">Return to login</a></p>
+            </form>
+          </section>
+
+          <section id="passwordStep" class="hidden">
+            <div class="form-heading"><h2>Choose a new password</h2><p>Your account was verified. Enter and confirm your new password.</p></div>
+            <div class="token-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>This secure reset request expires in <strong id="tokenTime">10:00</strong>.</div>
+            <form id="passwordForm" novalidate>
+              <div class="field">
+                <div class="field-label-row"><label for="newPassword">New password</label><span class="field-hint">Minimum 8 characters</span></div>
+                <div class="input-wrap"><svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="3"/><path d="M8 10V7a4 4 0 018 0v3M12 15v2"/></svg><input id="newPassword" name="newPassword" type="password" minlength="8" maxlength="72" autocomplete="new-password" placeholder="Create a secure password" required><button class="password-toggle" id="newPasswordToggle" type="button" aria-label="Show new password"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="2.5"/></svg></button></div>
+                <div class="strength" id="passwordStrength"><div class="strength-bars"><span></span><span></span><span></span><span></span></div><div class="strength-copy"><span>Password strength</span><span id="strengthLabel">Weak</span></div></div>
+                <p class="field-error" id="newPasswordError"></p>
+              </div>
+              <div class="field">
+                <div class="field-label-row"><label for="confirmPassword">Confirm password</label><span class="field-hint">Enter it again</span></div>
+                <div class="input-wrap"><svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg><input id="confirmPassword" name="confirmPassword" type="password" minlength="8" maxlength="72" autocomplete="new-password" placeholder="Confirm your new password" required><button class="password-toggle" id="confirmPasswordToggle" type="button" aria-label="Show confirmed password"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="2.5"/></svg></button></div>
+                <p class="field-error" id="confirmPasswordError"></p>
+              </div>
+              <button class="submit-button" id="resetButton" type="submit">Update password <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+            </form>
+          </section>
+
+          <section id="successStep" class="success-state hidden">
+            <div class="success-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg></div>
+            <h2>Password updated</h2><p>Your new password has been saved securely. All previous login sessions have been signed out.</p>
+            <a class="login-button" href="./Login.html">Log in with new password <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          </section>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    (() => {
+      'use strict';
+      const SUPABASE_URL = 'https://vsafwjlosvbuonjuazxc.supabase.co';
+      const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_awYVK41RO6Wjq065B03S4w_qxAf8Qdn';
+      const icons = {
+        success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>',
+        error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 17h.01"/></svg>',
+        info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>',
+        arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>'
+      };
+
+      const verifyForm = document.getElementById('verifyForm');
+      const passwordForm = document.getElementById('passwordForm');
+      const verifyStep = document.getElementById('verifyStep');
+      const passwordStep = document.getElementById('passwordStep');
+      const successStep = document.getElementById('successStep');
+      const ownerNumber = document.getElementById('ownerNumber');
+      const email = document.getElementById('email');
+      const newPassword = document.getElementById('newPassword');
+      const confirmPassword = document.getElementById('confirmPassword');
+      const ownerError = document.getElementById('ownerError');
+      const emailError = document.getElementById('emailError');
+      const newPasswordError = document.getElementById('newPasswordError');
+      const confirmPasswordError = document.getElementById('confirmPasswordError');
+      const verifyButton = document.getElementById('verifyButton');
+      const resetButton = document.getElementById('resetButton');
+      const resultPanel = document.getElementById('resultPanel');
+      const resultIcon = document.getElementById('resultIcon');
+      const resultTitle = document.getElementById('resultTitle');
+      const resultMessage = document.getElementById('resultMessage');
+      const progressVerify = document.getElementById('progressVerify');
+      const progressPassword = document.getElementById('progressPassword');
+      const tokenTime = document.getElementById('tokenTime');
+      const passwordStrength = document.getElementById('passwordStrength');
+      const strengthLabel = document.getElementById('strengthLabel');
+      const strengthBars = [...document.querySelectorAll('.strength-bars span')];
+
+      let resetToken = sessionStorage.getItem('linkcode_password_reset_token') || '';
+      let resetDeadline = Number(sessionStorage.getItem('linkcode_password_reset_deadline')) || 0;
+      let tokenTimer = null;
+
+      function normalizeEmail(value) { return String(value || '').trim().toLowerCase(); }
+      function validEmail(value) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value); }
+      function setError(input, element, message) { element.textContent = message; input.classList.toggle('invalid', Boolean(message)); }
+      function showResult(type, title, message) { resultPanel.className = `result-panel show ${type}`; resultIcon.innerHTML = icons[type] || icons.error; resultTitle.textContent = title; resultMessage.textContent = message; }
+      function hideResult() { resultPanel.className = 'result-panel'; }
+
+      async function rpc(name, body) {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, { method: 'POST', headers: { apikey: SUPABASE_PUBLISHABLE_KEY, 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(body), cache: 'no-store' });
+        if (!response.ok) {
+          let payload = {}; try { payload = await response.json(); } catch (_) {}
+          const error = new Error(payload.message || payload.hint || `Recovery request failed (${response.status}).`); error.status = response.status; error.code = payload.code; throw error;
+        }
+        return response.json();
+      }
+
+      function setLoading(button, loading, text) { button.disabled = loading; button.innerHTML = loading ? `<span class="spinner"></span> ${text}` : `${text} ${icons.arrow}`; }
+
+      function startTokenTimer() {
+        clearInterval(tokenTimer);
+        const tick = () => {
+          const left = Math.max(0, resetDeadline - Date.now());
+          const totalSeconds = Math.ceil(left / 1000);
+          const minutes = Math.floor(totalSeconds / 60);
+          const seconds = String(totalSeconds % 60).padStart(2, '0');
+          tokenTime.textContent = `${minutes}:${seconds}`;
+          if (left <= 0) {
+            clearInterval(tokenTimer); resetToken = ''; sessionStorage.removeItem('linkcode_password_reset_token'); sessionStorage.removeItem('linkcode_password_reset_deadline');
+            showResult('error', 'Recovery request expired', 'Verify your member ID and email again to continue.');
+            passwordStep.classList.add('hidden'); verifyStep.classList.remove('hidden');
+            progressVerify.className = 'progress-step active'; progressVerify.querySelector('.progress-number').textContent = '1'; progressPassword.className = 'progress-step';
+          }
+        };
+        tick(); tokenTimer = setInterval(tick, 1000);
+      }
+
+      async function verifyAccount(event) {
+        event.preventDefault(); hideResult();
+        const number = ownerNumber.value.replace(/\D/g, '');
+        const normalizedEmail = normalizeEmail(email.value);
+        ownerNumber.value = number;
+        setError(ownerNumber, ownerError, ''); setError(email, emailError, '');
+        if (!number) { setError(ownerNumber, ownerError, 'Enter the numeric part of your member ID.'); ownerNumber.focus(); return; }
+        if (!validEmail(normalizedEmail)) { setError(email, emailError, 'Enter your registered email address.'); email.focus(); return; }
+        setLoading(verifyButton, true, 'Verifying account…');
+        try {
+          const result = await rpc('request_member_password_reset', { p_owner_number: number, p_email: normalizedEmail });
+          if (result?.success) {
+            resetToken = result.reset_token; resetDeadline = Date.now() + Number(result.expires_in_seconds || 600) * 1000;
+            sessionStorage.setItem('linkcode_password_reset_token', resetToken); sessionStorage.setItem('linkcode_password_reset_deadline', String(resetDeadline));
+            progressVerify.className = 'progress-step done'; progressVerify.querySelector('.progress-number').textContent = '✓'; progressPassword.className = 'progress-step active';
+            verifyStep.classList.add('hidden'); passwordStep.classList.remove('hidden');
+            showResult('success', 'Account verified', 'Your member ID and email match. Choose a new password below.'); startTokenTimer(); newPassword.focus();
+            return;
+          }
+          const messages = { INVALID_MEMBER_ID: 'Enter a valid numeric member ID.', INVALID_EMAIL: 'Enter a valid email address.', DETAILS_MISMATCH: 'The member ID and email do not match our records.', RATE_LIMITED: 'Too many unsuccessful attempts. Wait 30 minutes before trying again.' };
+          showResult('error', 'Unable to verify account', messages[result?.reason] || 'Review your details and try again.');
+        } catch (error) {
+          const setupMissing = error.code === 'PGRST202' || error.status === 404 || /request_member_password_reset/i.test(error.message);
+          showResult('error', 'Recovery service unavailable', setupMissing ? 'Run supabase-password-recovery.sql in Supabase before using this page.' : (error.message || 'Try again in a moment.'));
+        } finally { setLoading(verifyButton, false, 'Verify account'); }
+      }
+
+      function passwordScore(value) { if (!value) return 0; let n = 0; if (value.length >= 8) n++; if (value.length >= 12) n++; if (/[a-z]/.test(value) && /[A-Z]/.test(value)) n++; if (/\d/.test(value) && /[^A-Za-z0-9]/.test(value)) n++; return Math.min(4, n); }
+      function updateStrength() { const score = passwordScore(newPassword.value), states = ['', 'weak', 'fair', 'good', 'strong'], labels = ['', 'Weak', 'Fair', 'Good', 'Strong']; passwordStrength.classList.toggle('show', newPassword.value.length > 0); strengthLabel.textContent = labels[score] || 'Weak'; strengthBars.forEach((bar, i) => bar.className = i < score ? `active ${states[score]}` : ''); }
+
+      async function updatePassword(event) {
+        event.preventDefault(); hideResult();
+        setError(newPassword, newPasswordError, ''); setError(confirmPassword, confirmPasswordError, '');
+        if (!resetToken || resetDeadline <= Date.now()) { showResult('error', 'Recovery request expired', 'Verify your account details again.'); return; }
+        const password = newPassword.value, confirmation = confirmPassword.value;
+        if (password.length < 8 || new TextEncoder().encode(password).length > 72) { setError(newPassword, newPasswordError, 'Use a password between 8 characters and 72 bytes.'); newPassword.focus(); return; }
+        if (password !== confirmation) { setError(confirmPassword, confirmPasswordError, 'The passwords do not match.'); confirmPassword.focus(); return; }
+        setLoading(resetButton, true, 'Updating password…');
+        try {
+          const result = await rpc('complete_member_password_reset', { p_reset_token: resetToken, p_new_password: password, p_confirm_password: confirmation });
+          if (result?.success) {
+            clearInterval(tokenTimer); sessionStorage.removeItem('linkcode_password_reset_token'); sessionStorage.removeItem('linkcode_password_reset_deadline');
+            ['linkcode_auth','linkcode_user','linkcode_session_token','linkcode_session_expires'].forEach(key => { localStorage.removeItem(key); sessionStorage.removeItem(key); });
+            resultPanel.className = 'result-panel'; document.getElementById('progress').classList.add('hidden'); passwordStep.classList.add('hidden'); successStep.classList.remove('hidden');
+            setTimeout(() => window.location.assign('./Login.html'), 2500); return;
+          }
+          const messages = { RESET_INVALID: 'This recovery request is invalid or has already been used.', RESET_EXPIRED: 'This recovery request has expired. Verify your account again.', INVALID_PASSWORD: 'Use at least 8 characters for your new password.', PASSWORD_MISMATCH: 'The new passwords do not match.', PASSWORD_UNCHANGED: 'Choose a password different from your current password.' };
+          showResult('error', 'Password was not changed', messages[result?.reason] || 'Try the recovery process again.');
+        } catch (error) {
+          const setupMissing = error.code === 'PGRST202' || error.status === 404 || /complete_member_password_reset/i.test(error.message);
+          showResult('error', 'Unable to update password', setupMissing ? 'Run supabase-password-recovery.sql in Supabase before using this page.' : (error.message || 'Try again in a moment.'));
+        } finally { setLoading(resetButton, false, 'Update password'); }
+      }
+
+      function setupToggle(buttonId, input) { const button = document.getElementById(buttonId); button.addEventListener('click', () => { const showing = input.type === 'text'; input.type = showing ? 'password' : 'text'; button.setAttribute('aria-label', showing ? 'Show password' : 'Hide password'); }); }
+      ownerNumber.addEventListener('input', () => { ownerNumber.value = ownerNumber.value.replace(/\D/g, '').slice(0, 30); setError(ownerNumber, ownerError, ''); });
+      email.addEventListener('input', () => setError(email, emailError, ''));
+      newPassword.addEventListener('input', () => { setError(newPassword, newPasswordError, ''); updateStrength(); });
+      confirmPassword.addEventListener('input', () => setError(confirmPassword, confirmPasswordError, ''));
+      setupToggle('newPasswordToggle', newPassword); setupToggle('confirmPasswordToggle', confirmPassword);
+      verifyForm.addEventListener('submit', verifyAccount); passwordForm.addEventListener('submit', updatePassword);
+
+      const params = new URLSearchParams(location.search); const emailParam = params.get('email'); if (emailParam) email.value = emailParam.slice(0, 254);
+      if (/^[a-f0-9]{64}$/.test(resetToken) && resetDeadline > Date.now()) { verifyStep.classList.add('hidden'); passwordStep.classList.remove('hidden'); progressVerify.className = 'progress-step done'; progressVerify.querySelector('.progress-number').textContent = '✓'; progressPassword.className = 'progress-step active'; showResult('info', 'Recovery request restored', 'Enter and confirm your new password before the request expires.'); startTokenTimer(); }
+    })();
+  </script>
+</body>
+</html>

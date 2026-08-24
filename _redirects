@@ -1,0 +1,2 @@
+# Redirects are now handled by the Cloudflare Pages Function in /functions/[[path]].js
+# (the previous Netlify _redirects + Edge Function have been migrated)

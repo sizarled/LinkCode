@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Enter a six-digit LinkCode to securely unlock its destination.">
+  <meta name="theme-color" content="#071513">
+  <title>Unlock a Code — LinkCode</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23c8ff62'/%3E%3Cpath d='M26 39l-4 4a8 8 0 01-11-11l9-9a8 8 0 0111 0' fill='none' stroke='%23071513' stroke-width='6' stroke-linecap='round'/%3E%3Cpath d='M38 25l4-4a8 8 0 0111 11l-9 9a8 8 0 01-11 0' fill='none' stroke='%23071513' stroke-width='6' stroke-linecap='round'/%3E%3Cpath d='M24 32h16' stroke='%23071513' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      --ink: #071513;
+      --ink-2: #102521;
+      --surface: #ffffff;
+      --soft: #f1f6f3;
+      --line: #dce6e0;
+      --muted: #687772;
+      --lime: #c8ff62;
+      --lime-deep: #a8e53c;
+      --purple: #8f7cff;
+      --orange: #ff9c68;
+      --red: #d9535b;
+      --red-soft: #fff0f1;
+      --amber: #b86b1c;
+      --amber-soft: #fff4e5;
+      --blue: #3b76d5;
+      --blue-soft: #eaf2ff;
+      --green: #397824;
+      --green-soft: #ecf9df;
+      --shadow: 0 35px 90px rgba(0, 0, 0, .27);
+    }
+
+    * { box-sizing: border-box; }
+    html { min-height: 100%; }
+    body {
+      min-height: 100vh; margin: 0; overflow-x: hidden;
+      color: var(--ink); background: var(--ink);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55; -webkit-font-smoothing: antialiased;
+    }
+    ::selection { color: var(--ink); background: var(--lime); }
+    button, input { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    a { color: inherit; text-decoration: none; }
+    svg { display: block; }
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+    }
+    .container { width: min(calc(100% - 40px), 1160px); margin-inline: auto; }
+
+    /* Header */
+    .site-header {
+      position: relative; z-index: 20; padding: 19px 0;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: rgba(7,21,19,.62); backdrop-filter: blur(18px);
+    }
+    .header-wrap { min-height: 46px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; color: white; }
+    .brand-mark {
+      width: 39px; height: 39px; display: grid; place-items: center; border-radius: 11px;
+      color: var(--ink); background: var(--lime); box-shadow: 0 0 0 5px rgba(200,255,98,.08);
+    }
+    .brand-mark svg { width: 23px; height: 23px; }
+    .brand-name { font-size: 1.16rem; font-weight: 850; letter-spacing: -.035em; }
+    .header-actions { display: flex; align-items: center; gap: 10px; }
+    .back-home { display: inline-flex; align-items: center; gap: 8px; color: #afc0ba; font-size: .82rem; font-weight: 720; transition: color .2s ease; }
+    .back-home:hover { color: var(--lime); }
+    .back-home svg { width: 17px; height: 17px; }
+    .header-divider { width: 1px; height: 25px; margin: 0 5px; background: rgba(255,255,255,.13); }
+    .header-account { display: flex; gap: 8px; }
+    .btn {
+      min-height: 44px; padding: 0 17px; border: 1px solid transparent; border-radius: 11px;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      color: var(--ink); background: var(--lime); font-size: .85rem; font-weight: 800; cursor: pointer;
+      transition: transform .2s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
+    }
+    .btn:hover { transform: translateY(-2px); background: #d5ff82; box-shadow: 0 11px 28px rgba(200,255,98,.15); }
+    .btn:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid rgba(143,124,255,.5); outline-offset: 3px; }
+    .btn-ghost { color: #e9f1ef; border-color: rgba(255,255,255,.14); background: rgba(255,255,255,.05); }
+    .btn-ghost:hover { background: rgba(255,255,255,.09); border-color: rgba(255,255,255,.25); box-shadow: none; }
+    .auth-logged { display: none; }
+    body.is-authenticated .auth-guest { display: none; }
+    body.is-authenticated .auth-logged { display: inline-flex; }
+
+    /* Background and layout */
+    .unlock-page {
+      position: relative; min-height: calc(100vh - 85px); padding: 70px 0 84px; overflow: hidden;
+      background:
+        radial-gradient(circle at 78% 18%, rgba(143,124,255,.23), transparent 28%),
+        radial-gradient(circle at 9% 80%, rgba(200,255,98,.09), transparent 25%),
+        var(--ink);
+    }
+    .unlock-page::before {
+      content: ""; position: absolute; inset: 0; opacity: .12; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px);
+      background-size: 66px 66px; mask-image: linear-gradient(to bottom, black, transparent 92%);
+    }
+    .ambient { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+    .ambient::before {
+      content: ""; position: absolute; width: 440px; height: 440px; right: -250px; bottom: -240px;
+      border: 1px solid rgba(200,255,98,.15); border-radius: 50%;
+      box-shadow: 0 0 0 75px rgba(200,255,98,.025), 0 0 0 150px rgba(200,255,98,.016);
+    }
+    .ambient::after {
+      content: ""; position: absolute; width: 220px; height: 220px; left: 44%; top: -150px;
+      border-radius: 50%; background: rgba(143,124,255,.15); filter: blur(45px);
+      animation: drift 8s ease-in-out infinite alternate;
+    }
+    @keyframes drift { to { transform: translate(65px, 35px) scale(1.13); } }
+    .unlock-grid {
+      position: relative; z-index: 2; display: grid; grid-template-columns: minmax(0, 1.06fr) minmax(390px, .94fr);
+      align-items: center; gap: 76px;
+    }
+
+    /* Form side */
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 9px; margin-bottom: 18px; padding: 8px 11px;
+      color: #c5d3cf; border: 1px solid rgba(255,255,255,.11); border-radius: 99px;
+      background: rgba(255,255,255,.045); font-size: .72rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase;
+    }
+    .eyebrow-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 0 5px rgba(200,255,98,.09); }
+    .unlock-copy h1 { max-width: 690px; margin: 0 0 18px; color: white; font-size: clamp(2.8rem, 5.8vw, 5.5rem); line-height: .98; letter-spacing: -.065em; }
+    .unlock-copy h1 span {
+      color: transparent; background: linear-gradient(100deg, var(--lime), #eaffbe 45%, #86e9c2);
+      -webkit-background-clip: text; background-clip: text;
+    }
+    .unlock-copy > p { max-width: 600px; margin: 0 0 31px; color: #9daea9; font-size: 1.02rem; }
+    .unlock-card {
+      max-width: 650px; padding: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,.14); border-radius: 22px;
+      background: rgba(255,255,255,.08); box-shadow: var(--shadow); backdrop-filter: blur(19px);
+    }
+    .form-surface { padding: 25px; border-radius: 15px; background: white; }
+    .input-label-row { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 10px; }
+    .input-label-row label { color: #465650; font-size: .75rem; font-weight: 850; }
+    .input-counter { color: #8c9894; font: 750 .7rem/1 ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .code-field { position: relative; display: flex; gap: 9px; }
+    .code-field-icon { position: absolute; left: 17px; top: 50%; translate: 0 -50%; width: 22px; height: 22px; z-index: 1; color: #60716b; }
+    .code-input {
+      width: 100%; height: 62px; padding: 0 145px 0 51px; border: 1px solid #d3ded8; border-radius: 12px;
+      color: var(--ink); background: #f3f7f5; font: 850 1.16rem/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: .14em; transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
+    }
+    .code-input::placeholder { color: #8b9793; font: 600 .86rem/1 Inter, ui-sans-serif, sans-serif; letter-spacing: 0; }
+    .code-input:focus { outline: none; border-color: var(--purple); background: white; box-shadow: 0 0 0 4px rgba(143,124,255,.11); }
+    .verify-button { position: absolute; right: 7px; top: 7px; min-width: 126px; min-height: 48px; border-radius: 9px; background: var(--ink); color: white; }
+    .verify-button:hover { background: #18352e; box-shadow: 0 9px 22px rgba(7,21,19,.18); }
+    .verify-button[disabled] { opacity: .58; cursor: wait; transform: none; box-shadow: none; }
+    .input-hint { min-height: 20px; margin: 8px 0 0 2px; color: #788680; font-size: .72rem; font-weight: 620; }
+    .input-hint.error { color: var(--red); }
+
+    /* Verification result */
+    .result-panel { display: none; margin-top: 10px; padding: 22px; border-radius: 15px; background: var(--soft); }
+    .result-panel.show { display: block; animation: resultIn .3s ease; }
+    @keyframes resultIn { from { opacity: 0; transform: translateY(8px) scale(.985); } }
+    .result-row { display: flex; align-items: flex-start; gap: 14px; }
+    .result-icon {
+      flex: 0 0 auto; width: 45px; height: 45px; display: grid; place-items: center; border-radius: 13px;
+      color: #53625d; background: #e2eae6;
+    }
+    .result-icon svg { width: 23px; height: 23px; }
+    .result-content { min-width: 0; flex: 1; }
+    .result-kicker { display: block; margin-bottom: 3px; color: #798681; font-size: .64rem; font-weight: 850; letter-spacing: .11em; text-transform: uppercase; }
+    .result-content h2 { margin: 0 0 5px; font-size: 1.08rem; line-height: 1.25; letter-spacing: -.025em; }
+    .result-content p { margin: 0; color: #6f7c78; font-size: .77rem; }
+    .result-meta { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 13px; }
+    .meta-pill { padding: 6px 9px; border: 1px solid #d9e3dd; border-radius: 8px; color: #52625d; background: rgba(255,255,255,.72); font-size: .65rem; font-weight: 800; }
+    .result-action { width: 100%; margin-top: 17px; min-height: 48px; background: var(--ink); color: white; }
+    .result-action:hover { background: #17352e; }
+    .result-action svg { width: 17px; height: 17px; }
+    .redirect-bar { height: 3px; margin-top: 18px; overflow: hidden; border-radius: 99px; background: rgba(57,120,36,.14); }
+    .redirect-bar span { display: block; width: 100%; height: 100%; transform-origin: left; background: var(--green); animation: redirectCountdown 1.8s linear forwards; }
+    @keyframes redirectCountdown { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+    .result-panel[data-state="checking"] { display: block; background: #f2f1ff; }
+    .result-panel[data-state="checking"] .result-icon { color: #5c4bc1; background: #e4e0ff; }
+    .result-panel[data-state="success"] { background: var(--green-soft); }
+    .result-panel[data-state="success"] .result-icon { color: var(--green); background: #d7efc0; }
+    .result-panel[data-state="not-found"] { background: var(--blue-soft); }
+    .result-panel[data-state="not-found"] .result-icon { color: var(--blue); background: #d8e7ff; }
+    .result-panel[data-state="inactive"], .result-panel[data-state="expired"] { background: var(--amber-soft); }
+    .result-panel[data-state="inactive"] .result-icon, .result-panel[data-state="expired"] .result-icon { color: var(--amber); background: #ffe5be; }
+    .result-panel[data-state="blocked"], .result-panel[data-state="error"] { background: var(--red-soft); }
+    .result-panel[data-state="blocked"] .result-icon, .result-panel[data-state="error"] .result-icon { color: var(--red); background: #ffdce0; }
+    .spinner { width: 22px; height: 22px; border: 2px solid rgba(92,75,193,.22); border-top-color: #5c4bc1; border-radius: 50%; animation: spin .75s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Visual side */
+    .security-visual { position: relative; min-height: 510px; perspective: 1000px; }
+    .orbit { position: absolute; width: 430px; height: 430px; right: -13px; top: 25px; border: 1px solid rgba(255,255,255,.09); border-radius: 50%; }
+    .orbit::before, .orbit::after { content: ""; position: absolute; border: 1px dashed rgba(200,255,98,.15); border-radius: 50%; }
+    .orbit::before { inset: 55px; animation: orbit 28s linear infinite; }
+    .orbit::after { inset: 120px; animation: orbit 19s linear reverse infinite; }
+    @keyframes orbit { to { transform: rotate(360deg); } }
+    .security-card {
+      position: absolute; left: 18px; top: 67px; width: min(100%, 400px); padding: 27px;
+      border: 1px solid rgba(255,255,255,.13); border-radius: 25px;
+      color: white; background: linear-gradient(145deg, rgba(255,255,255,.12), rgba(255,255,255,.055));
+      box-shadow: 0 36px 80px rgba(0,0,0,.27); backdrop-filter: blur(18px); transform: rotate(-2deg);
+    }
+    .security-card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 27px; }
+    .security-label { color: #9eb0aa; font-size: .68rem; font-weight: 850; letter-spacing: .11em; text-transform: uppercase; }
+    .secure-pill { padding: 5px 9px; border-radius: 99px; color: var(--lime); background: rgba(200,255,98,.11); font-size: .63rem; font-weight: 850; }
+    .lock-illustration { position: relative; width: 120px; height: 135px; margin: 15px auto 33px; }
+    .lock-shackle { position: absolute; width: 75px; height: 72px; left: 23px; top: 0; border: 11px solid var(--lime); border-bottom: 0; border-radius: 40px 40px 0 0; }
+    .lock-body { position: absolute; left: 0; right: 0; bottom: 0; height: 88px; display: grid; place-items: center; border-radius: 24px; color: var(--ink); background: var(--lime); box-shadow: 0 20px 45px rgba(200,255,98,.13); }
+    .lock-body svg { width: 31px; height: 31px; }
+    .check-list { display: grid; gap: 10px; padding-top: 21px; border-top: 1px solid rgba(255,255,255,.1); }
+    .check-item { display: flex; align-items: center; gap: 11px; color: #c6d3cf; font-size: .75rem; font-weight: 680; }
+    .check-dot { width: 25px; height: 25px; display: grid; place-items: center; border-radius: 8px; color: var(--lime); background: rgba(200,255,98,.09); }
+    .check-dot svg { width: 13px; height: 13px; }
+    .floating-level { position: absolute; right: -4px; bottom: 74px; padding: 16px 18px; border-radius: 16px; color: var(--ink); background: var(--lime); box-shadow: 0 22px 48px rgba(0,0,0,.25); transform: rotate(4deg); animation: float 4.5s ease-in-out infinite; }
+    .floating-level small { display: block; margin-bottom: 2px; font-size: .6rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+    .floating-level strong { display: block; font-size: 1.2rem; letter-spacing: -.04em; }
+    .floating-code { position: absolute; left: -8px; bottom: 30px; padding: 10px 13px; border: 1px solid rgba(255,255,255,.13); border-radius: 99px; color: #d8e3df; background: rgba(15,36,31,.83); box-shadow: 0 16px 35px rgba(0,0,0,.22); backdrop-filter: blur(12px); font: 750 .67rem/1 ui-monospace, monospace; letter-spacing: .08em; transform: rotate(-4deg); animation: float 5.2s -1.7s ease-in-out infinite; }
+    @keyframes float { 50% { translate: 0 -9px; } }
+    .trust-row { display: flex; flex-wrap: wrap; gap: 10px 18px; margin-top: 18px; color: #82948e; font-size: .7rem; font-weight: 700; }
+    .trust-row span { display: inline-flex; align-items: center; gap: 6px; }
+    .trust-row svg { width: 14px; height: 14px; color: var(--lime); }
+
+    @media (max-width: 920px) {
+      .unlock-page { padding-top: 56px; }
+      .unlock-grid { grid-template-columns: 1fr; gap: 35px; }
+      .unlock-copy { text-align: center; }
+      .unlock-copy > p, .unlock-card { margin-left: auto; margin-right: auto; }
+      .trust-row { justify-content: center; }
+      .security-visual { width: min(100%, 500px); min-height: 465px; margin: 0 auto; }
+      .security-card { left: 40px; }
+    }
+    @media (max-width: 620px) {
+      .container { width: min(calc(100% - 28px), 1160px); }
+      .site-header { padding: 13px 0; }
+      .header-account .btn-ghost, .header-divider { display: none; }
+      .header-account .btn { min-height: 40px; padding-inline: 13px; }
+      .back-home span { display: none; }
+      .unlock-page { min-height: calc(100vh - 67px); padding: 45px 0 62px; }
+      .unlock-copy h1 { font-size: clamp(2.65rem, 14vw, 4.2rem); }
+      .unlock-copy > p { font-size: .92rem; }
+      .unlock-card { padding: 7px; border-radius: 18px; }
+      .form-surface { padding: 19px 15px; }
+      .code-input { height: 59px; padding: 0 15px 0 48px; }
+      .verify-button { position: static; width: 100%; margin-top: 9px; }
+      .code-field { display: block; }
+      .result-panel { padding: 18px 15px; }
+      .security-visual { min-height: 385px; }
+      .orbit { width: 340px; height: 340px; right: -26px; }
+      .security-card { left: 0; top: 42px; width: calc(100% - 22px); padding: 21px; }
+      .lock-illustration { margin-bottom: 26px; transform: scale(.9); }
+      .floating-level { right: 0; bottom: 18px; }
+      .floating-code { left: 4px; bottom: 3px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-wrap">
+      <a class="brand" href="./index.html" aria-label="LinkCode home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 14.5l5-5"/><path d="M7.2 17.8l-1 1a3.5 3.5 0 01-5-5l4-4a3.5 3.5 0 015 0"/><path d="M16.8 6.2l1-1a3.5 3.5 0 015 5l-4 4a3.5 3.5 0 01-5 0"/></svg>
+        </span>
+        <span class="brand-name">LinkCode</span>
+      </a>
+      <div class="header-actions">
+        <a class="back-home" href="./index.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+          <span>Back to home</span>
+        </a>
+        <span class="header-divider" aria-hidden="true"></span>
+        <div class="header-account">
+          <a class="btn btn-ghost auth-guest" href="./Login.html">Log in</a>
+          <a class="btn auth-guest" href="./Register.html">Register</a>
+          <a class="btn auth-logged" href="./Dashboard.html">Dashboard</a>
+          <button class="btn btn-ghost auth-logged" id="logoutBtn" type="button">Log out</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="unlock-page">
+    <div class="ambient" aria-hidden="true"></div>
+    <div class="container unlock-grid">
+      <section class="unlock-copy" aria-labelledby="pageTitle">
+        <div class="eyebrow"><span class="eyebrow-dot"></span> Secure code verification</div>
+        <h1 id="pageTitle">Unlock your<br><span>destination.</span></h1>
+        <p>Enter a six-digit code. LinkCode will securely check its availability and status before taking you to the correct redirect page.</p>
+
+        <div class="unlock-card">
+          <div class="form-surface">
+            <form id="unlockForm" novalidate>
+              <div class="input-label-row">
+                <label for="codeInput">Six-digit LinkCode</label>
+                <span class="input-counter"><span id="digitCount">0</span>/6</span>
+              </div>
+              <div class="code-field">
+                <svg class="code-field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M8 9h.01M12 9h.01M16 9h.01M8 14h.01M12 14h4"/></svg>
+                <input class="code-input" id="codeInput" name="code" type="text" inputmode="numeric" pattern="[0-9]{6}" minlength="6" maxlength="6" autocomplete="one-time-code" placeholder="Enter 6 digits" aria-describedby="inputHint" autofocus>
+                <button class="btn verify-button" id="verifyButton" type="submit">Verify code</button>
+              </div>
+              <p class="input-hint" id="inputHint" role="alert" aria-live="polite">You can also open this page with <strong>?code=123456</strong>.</p>
+            </form>
+
+            <section class="result-panel" id="resultPanel" aria-live="polite" aria-atomic="true">
+              <div class="result-row">
+                <div class="result-icon" id="resultIcon" aria-hidden="true"></div>
+                <div class="result-content">
+                  <span class="result-kicker" id="resultKicker">Code status</span>
+                  <h2 id="resultTitle"></h2>
+                  <p id="resultMessage"></p>
+                  <div class="result-meta" id="resultMeta"></div>
+                </div>
+              </div>
+              <div id="resultAction"></div>
+            </section>
+          </div>
+        </div>
+
+        <div class="trust-row" aria-label="Verification details">
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg> Direct database check</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg> Status-aware routing</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg> Six digits only</span>
+        </div>
+      </section>
+
+      <aside class="security-visual" aria-label="Secure verification process">
+        <div class="orbit" aria-hidden="true"></div>
+        <div class="security-card">
+          <div class="security-card-head">
+            <span class="security-label">Verification path</span>
+            <span class="secure-pill">● SECURE</span>
+          </div>
+          <div class="lock-illustration" aria-hidden="true">
+            <div class="lock-shackle"></div>
+            <div class="lock-body"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><circle cx="12" cy="10" r="2"/><path d="M12 12v5"/></svg></div>
+          </div>
+          <div class="check-list">
+            <div class="check-item"><span class="check-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg></span>Check code in the Links database</div>
+            <div class="check-item"><span class="check-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg></span>Validate availability and link status</div>
+            <div class="check-item"><span class="check-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg></span>Route by the verified link level</div>
+          </div>
+        </div>
+        <div class="floating-level"><small>Supported levels</small><strong>LV0 → LV5</strong></div>
+        <div class="floating-code">CODE: 123456</div>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    (() => {
+      'use strict';
+
+      // Supabase browser access. The publishable key is intentionally public;
+      // database security must be enforced with RLS and column grants.
+      const SUPABASE_URL = 'https://vsafwjlosvbuonjuazxc.supabase.co';
+      const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_awYVK41RO6Wjq065B03S4w_qxAf8Qdn';
+      const REDIRECT_DELAY_MS = 1800;
+
+      const icons = {
+        search: '<div class="spinner"></div>',
+        success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>',
+        available: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>',
+        inactive: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg>',
+        expired: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+        blocked: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M8.5 8.5l7 7M15.5 8.5l-7 7"/></svg>',
+        error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 17h.01"/></svg>',
+        arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>'
+      };
+
+      const unlockForm = document.getElementById('unlockForm');
+      const codeInput = document.getElementById('codeInput');
+      const verifyButton = document.getElementById('verifyButton');
+      const digitCount = document.getElementById('digitCount');
+      const inputHint = document.getElementById('inputHint');
+      const resultPanel = document.getElementById('resultPanel');
+      const resultIcon = document.getElementById('resultIcon');
+      const resultKicker = document.getElementById('resultKicker');
+      const resultTitle = document.getElementById('resultTitle');
+      const resultMessage = document.getElementById('resultMessage');
+      const resultMeta = document.getElementById('resultMeta');
+      const resultAction = document.getElementById('resultAction');
+
+      let activeRequest = null;
+      let autoCheckTimer = null;
+      let redirectTimer = null;
+      let lastCheckedCode = '';
+
+      const setHint = (message, isError = false) => {
+        inputHint.innerHTML = message;
+        inputHint.classList.toggle('error', isError);
+      };
+
+      const renderResult = ({ state, kicker, title, message, icon, meta = '', action = '' }) => {
+        resultPanel.classList.add('show');
+        resultPanel.dataset.state = state;
+        resultKicker.textContent = kicker;
+        resultTitle.textContent = title;
+        resultMessage.textContent = message;
+        resultIcon.innerHTML = icons[icon] || icons.error;
+        resultMeta.innerHTML = meta;
+        resultAction.innerHTML = action;
+      };
+
+      const clearPending = () => {
+        if (activeRequest) activeRequest.abort();
+        if (redirectTimer) clearTimeout(redirectTimer);
+        activeRequest = null;
+        redirectTimer = null;
+      };
+
+      const createCodeUrl = code => {
+        const authenticated = localStorage.getItem('linkcode_auth') === 'true';
+        const page = authenticated ? './Dashboard.html' : './Register.html';
+        return `${page}?action=create&code=${encodeURIComponent(code)}`;
+      };
+
+      const redirectUrlFor = (level, code) => {
+        const safeLevel = /^LV[0-5]$/.test(level) ? level : 'LV0';
+        return `./Redirect.html?${safeLevel}=${encodeURIComponent(code)}`;
+      };
+
+      const verifyCode = async rawCode => {
+        const code = String(rawCode || '').replace(/\D/g, '').slice(0, 6);
+        codeInput.value = code;
+        digitCount.textContent = code.length;
+
+        if (!/^\d{6}$/.test(code)) {
+          setHint('A valid LinkCode must contain exactly six digits.', true);
+          resultPanel.classList.remove('show');
+          codeInput.focus();
+          return;
+        }
+
+        clearPending();
+        lastCheckedCode = code;
+        const requestController = new AbortController();
+        activeRequest = requestController;
+        verifyButton.disabled = true;
+        verifyButton.textContent = 'Checking…';
+        setHint('Checking the <strong>Links</strong> database…');
+        renderResult({
+          state: 'checking', kicker: 'Please wait', title: 'Verifying your code',
+          message: `We are checking code ${code} and reading its current status.`, icon: 'search',
+          meta: `<span class="meta-pill">CODE ${code}</span>`
+        });
+
+        try {
+          // Use the SECURITY DEFINER lookup RPC instead of querying Links directly.
+          // A direct REST query returns an empty array when RLS hides rows from anon users,
+          // which previously caused existing codes to appear as "not found".
+          const endpoint = `${SUPABASE_URL}/rest/v1/rpc/get_redirect_link_info`;
+          const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+              apikey: SUPABASE_PUBLISHABLE_KEY,
+              'Content-Type': 'application/json',
+              Accept: 'application/json'
+            },
+            body: JSON.stringify({ p_code: code }),
+            signal: requestController.signal,
+            cache: 'no-store'
+          });
+
+          if (!response.ok) {
+            let detail = '';
+            let errorCode = '';
+            try {
+              const payload = await response.json();
+              detail = payload.message || payload.hint || '';
+              errorCode = payload.code || '';
+            } catch (_) { /* The status message below is enough. */ }
+            if (response.status === 404 || errorCode === 'PGRST202') {
+              throw new Error('The code lookup service is not configured. Run supabase-redirect-rpc.sql in Supabase.');
+            }
+            throw new Error(detail || `Database request failed (${response.status}).`);
+          }
+
+          const payload = await response.json();
+          const links = Array.isArray(payload) ? payload : (payload ? [payload] : []);
+          if (lastCheckedCode !== code) return;
+
+          if (!Array.isArray(links) || links.length === 0) {
+            const createUrl = createCodeUrl(code);
+            setHint(`Code <strong>${code}</strong> is not currently in use.`);
+            renderResult({
+              state: 'not-found', kicker: 'Code available', title: 'This code does not exist yet',
+              message: 'You can create a new LinkCode using the same six-digit number.', icon: 'available',
+              meta: `<span class="meta-pill">CODE ${code}</span><span class="meta-pill">AVAILABLE</span>`,
+              action: `<a class="btn result-action" href="${createUrl}">Create code ${code}${icons.arrow}</a>`
+            });
+            return;
+          }
+
+          const link = links[0];
+          const expirationTime = link.link_expiration_date ? Date.parse(link.link_expiration_date) : null;
+          const expiredByDate = Number.isFinite(expirationTime) && expirationTime <= Date.now();
+          const status = expiredByDate ? 'Expired' : String(link.code_status || 'Inactive');
+          const level = /^LV[0-5]$/.test(link.link_level) ? link.link_level : 'LV0';
+          const meta = `<span class="meta-pill">CODE ${code}</span><span class="meta-pill">${level}</span><span class="meta-pill">${status.toUpperCase()}</span>`;
+
+          if (status === 'Active') {
+            const redirectUrl = redirectUrlFor(level, code);
+            setHint(`Code <strong>${code}</strong> was verified successfully.`);
+            renderResult({
+              state: 'success', kicker: 'Access granted', title: 'Code unlocked',
+              message: `The code is active. Opening the ${level} redirect page now…`, icon: 'success', meta,
+              action: `<a class="btn result-action" href="${redirectUrl}">Continue now${icons.arrow}</a><div class="redirect-bar" aria-hidden="true"><span></span></div>`
+            });
+            redirectTimer = window.setTimeout(() => window.location.assign(redirectUrl), REDIRECT_DELAY_MS);
+            return;
+          }
+
+          if (status === 'Inactive') {
+            setHint(`Code <strong>${code}</strong> exists but is currently inactive.`, true);
+            renderResult({
+              state: 'inactive', kicker: 'Access unavailable', title: 'This code is inactive',
+              message: 'The publisher has disabled this link. Please try again later or contact the publisher.', icon: 'inactive', meta
+            });
+            return;
+          }
+
+          if (status === 'Expired') {
+            setHint(`Code <strong>${code}</strong> has expired.`, true);
+            renderResult({
+              state: 'expired', kicker: 'Access unavailable', title: 'This code has expired',
+              message: 'The link has reached its expiration date and can no longer be opened.', icon: 'expired', meta
+            });
+            return;
+          }
+
+          if (status === 'Blocked') {
+            setHint(`Code <strong>${code}</strong> is blocked.`, true);
+            renderResult({
+              state: 'blocked', kicker: 'Access denied', title: 'This code has been blocked',
+              message: 'LinkCode blocked this link for security or policy reasons. It cannot be opened.', icon: 'blocked', meta
+            });
+            return;
+          }
+
+          throw new Error(`Unsupported link status: ${status}`);
+        } catch (error) {
+          if (error.name === 'AbortError') return;
+          console.error('LinkCode verification failed:', error);
+          setHint('We could not complete the database check. Please try again.', true);
+          renderResult({
+            state: 'error', kicker: 'Verification error', title: 'Unable to check this code',
+            message: error.message || 'Check your connection and try again in a moment.', icon: 'error',
+            action: '<button class="btn result-action" id="retryButton" type="button">Try again</button>'
+          });
+          document.getElementById('retryButton')?.addEventListener('click', () => verifyCode(code));
+        } finally {
+          if (activeRequest === requestController) {
+            activeRequest = null;
+            verifyButton.disabled = false;
+            verifyButton.textContent = 'Verify code';
+          }
+        }
+      };
+
+      codeInput.addEventListener('input', () => {
+        const digits = codeInput.value.replace(/\D/g, '').slice(0, 6);
+        if (codeInput.value !== digits) {
+          setHint('Only numbers can be used in a LinkCode.', true);
+        } else {
+          setHint('Verification starts automatically after the sixth digit.');
+        }
+        codeInput.value = digits;
+        digitCount.textContent = digits.length;
+        clearTimeout(autoCheckTimer);
+        if (redirectTimer) clearTimeout(redirectTimer);
+        if (digits !== lastCheckedCode) resultPanel.classList.remove('show');
+        if (digits.length === 6) {
+          autoCheckTimer = window.setTimeout(() => verifyCode(digits), 320);
+        }
+      });
+
+      unlockForm.addEventListener('submit', event => {
+        event.preventDefault();
+        clearTimeout(autoCheckTimer);
+        verifyCode(codeInput.value);
+      });
+
+      // Automatically read and verify /unlock?code=123456 (rewritten to this file by Cloudflare Pages Function).
+      const queryCode = new URLSearchParams(window.location.search).get('code');
+      if (queryCode !== null) {
+        const sanitizedQueryCode = queryCode.replace(/\D/g, '').slice(0, 6);
+        codeInput.value = sanitizedQueryCode;
+        digitCount.textContent = sanitizedQueryCode.length;
+        if (/^\d{6}$/.test(queryCode)) {
+          window.setTimeout(() => verifyCode(queryCode), 420);
+        } else {
+          setHint('The code in the URL must contain exactly six digits.', true);
+        }
+      }
+
+      // Keep the account actions consistent with the homepage.
+      const syncAuthState = () => {
+        const authenticated = localStorage.getItem('linkcode_auth') === 'true' || sessionStorage.getItem('linkcode_auth') === 'true';
+        document.body.classList.toggle('is-authenticated', authenticated);
+      };
+      syncAuthState();
+      window.addEventListener('storage', syncAuthState);
+      document.getElementById('logoutBtn').addEventListener('click', () => {
+        ['linkcode_auth', 'linkcode_user', 'linkcode_session_token', 'linkcode_session_expires'].forEach(key => {
+          localStorage.removeItem(key);
+          sessionStorage.removeItem(key);
+        });
+        syncAuthState();
+      });
+    })();
+  </script>
+</body>
+</html>
