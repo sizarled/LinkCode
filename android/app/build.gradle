@@ -1,0 +1,52 @@
+plugins {
+    id 'com.android.application'
+}
+
+// The website lives in the repository root (index.html, Login.html, unlock/, assets/ ...).
+// The Sync task copies only the web files into the build folder, so the repository
+// stays the single source of truth: edit the site, rebuild the APK, done.
+def webRoot = rootProject.projectDir.parentFile
+def webAssetsDir = layout.buildDirectory.dir('generated/web-assets')
+
+tasks.register('syncWebAssets', Sync) {
+    from(webRoot) {
+        include '*.html'
+        include 'assets/**'
+        include 'unlock/**'
+    }
+    into webAssetsDir
+}
+
+android {
+    namespace 'com.linkcode.app'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'com.linkcode.app'
+        minSdk 26
+        targetSdk 35
+        versionCode 1
+        versionName '1.0'
+    }
+
+    sourceSets {
+        main {
+            assets.srcDir webAssetsDir
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+tasks.named('preBuild') {
+    dependsOn 'syncWebAssets'
+}
