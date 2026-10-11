@@ -25,11 +25,20 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      # ubuntu-latest ships with the Android SDK preinstalled (ANDROID_HOME, sdkmanager on PATH).
-      - name: Install Android SDK packages
+      # ubuntu-latest ships with the Android SDK preinstalled. Locate it and install
+      # the platform/build-tools only if they are missing.
+      - name: Prepare Android SDK
         run: |
-          echo "ANDROID_HOME=$ANDROID_HOME"
-          sdkmanager --install "platforms;android-35" "build-tools;35.0.0"
+          SDK="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          echo "Using SDK at: $SDK"
+          ls "$SDK" || true
+          if [ ! -d "$SDK/platforms/android-35" ] || [ ! -d "$SDK/build-tools/35.0.0" ]; then
+            SDKM="$(find "$SDK/cmdline-tools" -path '*bin/sdkmanager' | head -n 1)"
+            echo "sdkmanager: $SDKM"
+            yes | "$SDKM" --sdk_root="$SDK" --licenses > /dev/null || true
+            "$SDKM" --sdk_root="$SDK" "platforms;android-35" "build-tools;35.0.0"
+          fi
+          echo "ANDROID_HOME=$SDK" >> "$GITHUB_ENV"
 
       - uses: gradle/actions/setup-gradle@v4
         with:
