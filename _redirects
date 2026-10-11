@@ -1,2 +1,13 @@
-# Redirects are now handled by the Cloudflare Pages Function in /functions/[[path]].js
-# (the previous Netlify _redirects + Edge Function have been migrated)
+# ─────────────────────────────────────────────────────────────────────────────
+# LinkCode routing
+#
+# IMPORTANT — READ BEFORE DEPLOYING:
+#   /unlock is served as a REAL FOLDER (unlock/index.html).
+#   Do NOT add any redirect/rewrite rule for "/unlock" here OR in the
+#   Netlify dashboard UI. A rewrite like "/unlock /Unlock.html 200" combined
+#   with Netlify's automatic pretty-URL redirect (Unlock.html -> /unlock)
+#   creates an infinite 301 loop (ERR_TOO_MANY_REDIRECTS).
+#
+#   Short codes (/123456) are handled by the Edge Function:
+#   netlify/edge-functions/short-code.js  →  302 /unlock?code=123456
+# ─────────────────────────────────────────────────────────────────────────────
