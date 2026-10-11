@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Create your LinkCode account to publish, manage, and monetize smarter links.">
+  <meta name="theme-color" content="#071513">
+  <title>Create Your Account — LinkCode</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23c8ff62'/%3E%3Cpath d='M26 39l-4 4a8 8 0 01-11-11l9-9a8 8 0 0111 0' fill='none' stroke='%23071513' stroke-width='6' stroke-linecap='round'/%3E%3Cpath d='M38 25l4-4a8 8 0 0111 11l-9 9a8 8 0 01-11 0' fill='none' stroke='%23071513' stroke-width='6' stroke-linecap='round'/%3E%3Cpath d='M24 32h16' stroke='%23071513' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      --ink: #071513;
+      --ink-2: #102521;
+      --surface: #fff;
+      --soft: #f2f6f3;
+      --line: #d9e4de;
+      --muted: #687772;
+      --lime: #c8ff62;
+      --lime-deep: #a7e23e;
+      --purple: #8f7cff;
+      --orange: #ff9c68;
+      --green: #367424;
+      --green-soft: #ebf9df;
+      --blue: #3d71c5;
+      --blue-soft: #edf4ff;
+      --red: #c94651;
+      --red-soft: #fff0f1;
+      --amber: #a9681e;
+      --amber-soft: #fff3e2;
+      --shadow: 0 35px 90px rgba(0,0,0,.26);
+    }
+
+    * { box-sizing: border-box; }
+    html { min-height: 100%; }
+    body {
+      min-height: 100vh; margin: 0; overflow-x: hidden; color: var(--ink); background: var(--ink);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55; -webkit-font-smoothing: antialiased;
+    }
+    ::selection { color: var(--ink); background: var(--lime); }
+    button, input { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    a { color: inherit; text-decoration: none; }
+    svg { display: block; }
+    .container { width: min(calc(100% - 40px), 1160px); margin-inline: auto; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+    /* Header */
+    .site-header { position: relative; z-index: 20; padding: 17px 0; border-bottom: 1px solid rgba(255,255,255,.08); background: rgba(7,21,19,.7); backdrop-filter: blur(18px); }
+    .header-wrap { min-height: 47px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; color: white; }
+    .brand-mark { width: 39px; height: 39px; display: grid; place-items: center; border-radius: 11px; color: var(--ink); background: var(--lime); box-shadow: 0 0 0 5px rgba(200,255,98,.08); }
+    .brand-mark svg { width: 23px; height: 23px; }
+    .brand-name { font-size: 1.16rem; font-weight: 850; letter-spacing: -.035em; }
+    .header-actions { display: flex; align-items: center; gap: 12px; }
+    .header-actions > span { color: #899c95; font-size: .75rem; font-weight: 650; }
+    .login-link { min-height: 41px; padding: 0 14px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,.14); border-radius: 10px; color: white; background: rgba(255,255,255,.045); font-size: .78rem; font-weight: 780; transition: transform .2s ease, background .2s ease, border-color .2s ease; }
+    .login-link:hover { transform: translateY(-2px); border-color: rgba(255,255,255,.25); background: rgba(255,255,255,.08); }
+
+    /* Layout */
+    .register-page {
+      position: relative; min-height: calc(100vh - 82px); padding: 62px 0 82px; overflow: hidden;
+      background: radial-gradient(circle at 82% 12%, rgba(143,124,255,.22), transparent 27%), radial-gradient(circle at 7% 78%, rgba(200,255,98,.09), transparent 25%), var(--ink);
+    }
+    .register-page::before { content: ""; position: absolute; inset: 0; opacity: .11; pointer-events: none; background-image: linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px); background-size: 66px 66px; mask-image: linear-gradient(to bottom, black, transparent 93%); }
+    .register-page::after { content: ""; position: absolute; width: 460px; height: 460px; right: -270px; bottom: -270px; border: 1px solid rgba(200,255,98,.14); border-radius: 50%; box-shadow: 0 0 0 78px rgba(200,255,98,.023), 0 0 0 156px rgba(200,255,98,.014); }
+    .register-grid { position: relative; z-index: 2; display: grid; grid-template-columns: minmax(0, .88fr) minmax(440px, 1.12fr); align-items: center; gap: 80px; }
+
+    /* Brand story */
+    .story { color: white; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 18px; padding: 7px 11px; border: 1px solid rgba(255,255,255,.11); border-radius: 99px; color: #c5d3cf; background: rgba(255,255,255,.045); font-size: .68rem; font-weight: 820; letter-spacing: .08em; text-transform: uppercase; }
+    .eyebrow span { width: 7px; height: 7px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 0 5px rgba(200,255,98,.09); }
+    .story h1 { max-width: 600px; margin: 0 0 18px; font-size: clamp(2.85rem, 5.8vw, 5.35rem); line-height: .98; letter-spacing: -.065em; }
+    .story h1 em { color: transparent; background: linear-gradient(100deg, var(--lime), #eaffbd 46%, #88ebc4); -webkit-background-clip: text; background-clip: text; font-style: normal; }
+    .story > p { max-width: 510px; margin: 0; color: #9bada7; font-size: .95rem; }
+    .benefits { display: grid; gap: 12px; margin-top: 32px; }
+    .benefit { display: flex; align-items: center; gap: 13px; max-width: 480px; padding: 13px; border: 1px solid rgba(255,255,255,.09); border-radius: 13px; background: rgba(255,255,255,.04); backdrop-filter: blur(8px); }
+    .benefit-icon { flex: 0 0 auto; width: 37px; height: 37px; display: grid; place-items: center; border-radius: 10px; color: var(--ink); background: var(--lime); }
+    .benefit:nth-child(2) .benefit-icon { background: #dcd6ff; }
+    .benefit:nth-child(3) .benefit-icon { background: #b7edd7; }
+    .benefit-icon svg { width: 19px; height: 19px; }
+    .benefit strong { display: block; margin-bottom: 1px; font-size: .77rem; }
+    .benefit span { display: block; color: #82958e; font-size: .68rem; }
+    .trust-note { display: flex; align-items: center; gap: 9px; margin-top: 22px; color: #72867e; font-size: .66rem; font-weight: 700; }
+    .trust-note svg { width: 15px; height: 15px; color: var(--lime); }
+
+    /* Form card */
+    .form-card { position: relative; padding: 10px; border: 1px solid rgba(255,255,255,.13); border-radius: 27px; background: rgba(255,255,255,.075); box-shadow: var(--shadow); backdrop-filter: blur(20px); }
+    .form-card::before { content: ""; position: absolute; inset: 8% 12% -20px; z-index: -1; background: linear-gradient(90deg, rgba(200,255,98,.18), rgba(143,124,255,.2)); filter: blur(28px); }
+    .form-surface { padding: 33px; border-radius: 19px; background: white; }
+    .form-heading { margin-bottom: 25px; }
+    .form-heading h2 { margin: 0 0 6px; font-size: 1.65rem; line-height: 1.15; letter-spacing: -.045em; }
+    .form-heading p { margin: 0; color: var(--muted); font-size: .78rem; }
+    .field { margin-bottom: 15px; }
+    .field-label-row { display: flex; align-items: center; justify-content: space-between; margin: 0 2px 7px; }
+    .field label, .field-label-row label { color: #45554f; font-size: .7rem; font-weight: 820; }
+    .field-hint { color: #909c98; font-size: .61rem; font-weight: 700; }
+    .input-wrap { position: relative; }
+    .input-icon { position: absolute; width: 19px; height: 19px; left: 13px; top: 50%; translate: 0 -50%; color: #73817c; pointer-events: none; }
+    .field input[type="text"], .field input[type="email"], .field input[type="password"] {
+      width: 100%; height: 51px; padding: 0 43px 0 42px; border: 1px solid #d6e0da; border-radius: 11px; color: var(--ink); background: #f7f9f8; font-size: .8rem; font-weight: 650; transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
+    }
+    .field input::placeholder { color: #99a39f; font-weight: 550; }
+    .field input:focus { outline: none; border-color: var(--purple); background: white; box-shadow: 0 0 0 4px rgba(143,124,255,.1); }
+    .field input.invalid { border-color: var(--red); background: #fffafa; box-shadow: 0 0 0 3px rgba(201,70,81,.08); }
+    .password-toggle { position: absolute; right: 7px; top: 7px; width: 37px; height: 37px; padding: 0; display: grid; place-items: center; border: 0; border-radius: 8px; color: #6d7b76; background: transparent; cursor: pointer; }
+    .password-toggle:hover { background: #e9efec; }
+    .password-toggle svg { width: 18px; height: 18px; }
+    .field-error { min-height: 16px; margin: 5px 0 0 2px; color: var(--red); font-size: .62rem; font-weight: 700; }
+    .strength { display: none; margin-top: 8px; }
+    .strength.show { display: block; }
+    .strength-bars { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+    .strength-bars span { height: 4px; border-radius: 99px; background: #e1e8e4; transition: background .2s ease; }
+    .strength-bars span.active.weak { background: var(--red); }
+    .strength-bars span.active.fair { background: var(--orange); }
+    .strength-bars span.active.good { background: #d0b03e; }
+    .strength-bars span.active.strong { background: var(--lime-deep); }
+    .strength-copy { display: flex; justify-content: space-between; margin-top: 5px; color: #88958f; font-size: .59rem; font-weight: 700; }
+
+    /* Terms */
+    .terms { position: relative; display: flex; align-items: flex-start; gap: 10px; margin: 18px 0; cursor: pointer; }
+    .terms input { position: absolute; opacity: 0; pointer-events: none; }
+    .checkbox { flex: 0 0 auto; width: 19px; height: 19px; margin-top: 1px; display: grid; place-items: center; border: 1.5px solid #bdc9c3; border-radius: 6px; color: white; background: white; transition: border-color .2s ease, background .2s ease, box-shadow .2s ease; }
+    .checkbox svg { width: 12px; height: 12px; opacity: 0; }
+    .terms input:checked + .checkbox { border-color: var(--ink); background: var(--ink); }
+    .terms input:checked + .checkbox svg { opacity: 1; }
+    .terms input:focus-visible + .checkbox { box-shadow: 0 0 0 4px rgba(143,124,255,.18); }
+    .terms-copy { color: #6d7a76; font-size: .68rem; }
+    .terms-copy a { color: #5544b7; font-weight: 780; }
+    .terms-copy a:hover { text-decoration: underline; }
+    .submit-button { width: 100%; min-height: 52px; border: 0; border-radius: 11px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; color: white; background: var(--ink); font-size: .8rem; font-weight: 830; cursor: pointer; transition: transform .2s ease, background .2s ease, box-shadow .2s ease; }
+    .submit-button:hover { transform: translateY(-2px); background: #17352e; box-shadow: 0 13px 30px rgba(7,21,19,.2); }
+    .submit-button:disabled { opacity: .64; cursor: wait; transform: none; box-shadow: none; }
+    .submit-button svg { width: 17px; height: 17px; }
+    .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,.3); border-top-color: white; border-radius: 50%; animation: spin .75s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .form-foot { margin: 16px 0 0; color: #8a9792; text-align: center; font-size: .65rem; }
+    .form-foot a { color: var(--ink); font-weight: 800; }
+    .form-foot a:hover { text-decoration: underline; }
+
+    /* Results */
+    .result-panel { display: none; margin-bottom: 19px; padding: 15px; border-radius: 13px; animation: resultIn .3s ease; }
+    .result-panel.show { display: flex; gap: 11px; }
+    @keyframes resultIn { from { opacity: 0; transform: translateY(-7px); } }
+    .result-panel.success { color: var(--green); background: var(--green-soft); }
+    .result-panel.exists { color: var(--blue); background: var(--blue-soft); }
+    .result-panel.error { color: var(--red); background: var(--red-soft); }
+    .result-icon { flex: 0 0 auto; width: 35px; height: 35px; display: grid; place-items: center; border-radius: 10px; background: rgba(255,255,255,.7); }
+    .result-icon svg { width: 18px; height: 18px; }
+    .result-content { min-width: 0; flex: 1; }
+    .result-content strong { display: block; margin-bottom: 2px; color: currentColor; font-size: .76rem; }
+    .result-content span { display: block; color: #64736d; font-size: .66rem; line-height: 1.45; }
+    .recovery-button { min-height: 39px; margin-top: 10px; padding: 0 12px; display: inline-flex; align-items: center; gap: 7px; border: 1px solid #c8d9f3; border-radius: 9px; color: #315f9e; background: white; font-size: .67rem; font-weight: 810; }
+    .recovery-button:hover { border-color: #8fafd9; }
+    .recovery-button svg { width: 14px; height: 14px; }
+
+    @media (max-width: 930px) {
+      .register-grid { grid-template-columns: 1fr; gap: 45px; }
+      .story { text-align: center; }
+      .story > p, .benefits { margin-left: auto; margin-right: auto; }
+      .benefit { text-align: left; }
+      .trust-note { justify-content: center; }
+      .form-card { width: min(100%, 620px); margin-inline: auto; }
+    }
+    @media (max-width: 600px) {
+      .container { width: min(calc(100% - 28px), 1160px); }
+      .site-header { padding: 13px 0; }
+      .header-actions > span { display: none; }
+      .register-page { min-height: calc(100vh - 66px); padding: 44px 0 64px; }
+      .story h1 { font-size: clamp(2.75rem, 14vw, 4.1rem); }
+      .story > p { font-size: .86rem; }
+      .benefits { gap: 9px; }
+      .form-card { padding: 7px; border-radius: 21px; }
+      .form-surface { padding: 25px 18px; border-radius: 15px; }
+      .form-heading h2 { font-size: 1.45rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-wrap">
+      <a class="brand" href="./index.html" aria-label="LinkCode home">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M9.5 14.5l5-5"/><path d="M7.2 17.8l-1 1a3.5 3.5 0 01-5-5l4-4a3.5 3.5 0 015 0"/><path d="M16.8 6.2l1-1a3.5 3.5 0 015 5l-4 4a3.5 3.5 0 01-5 0"/></svg></span>
+        <span class="brand-name">LinkCode</span>
+      </a>
+      <div class="header-actions"><span>Already have an account?</span><a class="login-link" href="./Login.html">Log in</a></div>
+    </div>
+  </header>
+
+  <main class="register-page">
+    <div class="container register-grid">
+      <section class="story" aria-labelledby="pageTitle">
+        <div class="eyebrow"><span></span> Join LinkCode today</div>
+        <h1 id="pageTitle">Create links.<br><em>Build rewards.</em></h1>
+        <p>Open your free publisher account and turn simple six-digit codes into secure, measurable link journeys.</p>
+        <div class="benefits">
+          <div class="benefit"><span class="benefit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V9M10 19V5M16 19v-7M22 19V2"/></svg></span><span><strong>Level-based earnings</strong><span>Grow valid traffic and unlock rates up to five times higher.</span></span></div>
+          <div class="benefit"><span class="benefit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></span><span><strong>Protected link traffic</strong><span>Secure code verification and transparent visit rules.</span></span></div>
+          <div class="benefit"><span class="benefit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12v8H4v-8M2 7h20v5H2zM12 20V7M12 7H7.5A2.5 2.5 0 117 2c3.5 0 5 5 5 5zM12 7h4.5a2.5 2.5 0 10.5-5c-3.5 0-5 5-5 5z"/></svg></span><span><strong>Publisher Gift</strong><span>Reward registered visitors on eligible LV3+ links.</span></span></div>
+        </div>
+        <div class="trust-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Your password is encrypted before it is stored.</div>
+      </section>
+
+      <section class="form-card" aria-labelledby="registerTitle">
+        <div class="form-surface">
+          <div class="form-heading"><h2 id="registerTitle">Create your account</h2><p>Enter your details below. It only takes a minute.</p></div>
+          <div class="result-panel" id="resultPanel" role="status" aria-live="polite">
+            <span class="result-icon" id="resultIcon"></span>
+            <span class="result-content"><strong id="resultTitle"></strong><span id="resultMessage"></span><span id="resultAction"></span></span>
+          </div>
+
+          <form id="registerForm" novalidate>
+            <div class="field">
+              <div class="field-label-row"><label for="fullName">Full name</label><span class="field-hint">2–100 characters</span></div>
+              <div class="input-wrap">
+                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></svg>
+                <input id="fullName" name="fullName" type="text" minlength="2" maxlength="100" autocomplete="name" placeholder="Your full name" required>
+              </div>
+              <p class="field-error" id="nameError"></p>
+            </div>
+
+            <div class="field">
+              <div class="field-label-row"><label for="email">Email address</label><span class="field-hint">Use an active email</span></div>
+              <div class="input-wrap">
+                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7l8 6 8-6"/></svg>
+                <input id="email" name="email" type="email" maxlength="254" autocomplete="email" placeholder="you@example.com" required>
+              </div>
+              <p class="field-error" id="emailError"></p>
+            </div>
+
+            <div class="field">
+              <div class="field-label-row"><label for="password">Password</label><span class="field-hint">Minimum 8 characters</span></div>
+              <div class="input-wrap">
+                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="3"/><path d="M8 10V7a4 4 0 018 0v3M12 15v2"/></svg>
+                <input id="password" name="password" type="password" minlength="8" maxlength="72" autocomplete="new-password" placeholder="Create a secure password" required>
+                <button class="password-toggle" id="passwordToggle" type="button" aria-label="Show password" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="2.5"/></svg></button>
+              </div>
+              <div class="strength" id="passwordStrength" aria-live="polite"><div class="strength-bars"><span></span><span></span><span></span><span></span></div><div class="strength-copy"><span>Password strength</span><span id="strengthLabel">Weak</span></div></div>
+              <p class="field-error" id="passwordError"></p>
+            </div>
+
+            <label class="terms">
+              <input id="terms" name="terms" type="checkbox" required>
+              <span class="checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></span>
+              <span class="terms-copy">I agree to the <a href="./Terms.html" target="_blank">Terms of Service</a> and <a href="./Privacy.html" target="_blank">Privacy Policy</a>.</span>
+            </label>
+            <p class="field-error" id="termsError"></p>
+
+            <button class="submit-button" id="submitButton" type="submit">Create my account <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+            <p class="form-foot">Already registered? <a href="./Login.html">Log in to your account</a></p>
+          </form>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const SUPABASE_URL = 'https://vsafwjlosvbuonjuazxc.supabase.co';
+      const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_awYVK41RO6Wjq065B03S4w_qxAf8Qdn';
+      const DASHBOARD_URL = './Dashboard.html';
+
+      const registerForm = document.getElementById('registerForm');
+      const fullNameInput = document.getElementById('fullName');
+      const emailInput = document.getElementById('email');
+      const passwordInput = document.getElementById('password');
+      const termsInput = document.getElementById('terms');
+      const submitButton = document.getElementById('submitButton');
+      const passwordToggle = document.getElementById('passwordToggle');
+      const passwordStrength = document.getElementById('passwordStrength');
+      const strengthLabel = document.getElementById('strengthLabel');
+      const strengthBars = [...document.querySelectorAll('.strength-bars span')];
+      const resultPanel = document.getElementById('resultPanel');
+      const resultIcon = document.getElementById('resultIcon');
+      const resultTitle = document.getElementById('resultTitle');
+      const resultMessage = document.getElementById('resultMessage');
+      const resultAction = document.getElementById('resultAction');
+      const nameError = document.getElementById('nameError');
+      const emailError = document.getElementById('emailError');
+      const passwordError = document.getElementById('passwordError');
+      const termsError = document.getElementById('termsError');
+
+      const icons = {
+        success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>',
+        exists: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0M18 5l3 3M21 5l-3 3"/></svg>',
+        error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 17h.01"/></svg>',
+        arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>'
+      };
+
+      function normalizeName(value) {
+        return String(value || '').trim().replace(/\s+/g, ' ');
+      }
+
+      function normalizeEmail(value) {
+        return String(value || '').trim().toLowerCase();
+      }
+
+      function validEmail(value) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
+      }
+
+      function setFieldError(input, errorElement, message) {
+        errorElement.textContent = message;
+        input.classList.toggle('invalid', Boolean(message));
+      }
+
+      function validateForm() {
+        const name = normalizeName(fullNameInput.value);
+        const email = normalizeEmail(emailInput.value);
+        const password = passwordInput.value;
+        let valid = true;
+
+        setFieldError(fullNameInput, nameError, '');
+        setFieldError(emailInput, emailError, '');
+        setFieldError(passwordInput, passwordError, '');
+        termsError.textContent = '';
+
+        if (name.length < 2 || name.length > 100) {
+          setFieldError(fullNameInput, nameError, 'Enter a full name between 2 and 100 characters.');
+          valid = false;
+        }
+        if (!validEmail(email) || email.length > 254) {
+          setFieldError(emailInput, emailError, 'Enter a valid email address.');
+          valid = false;
+        }
+        if (password.length < 8) {
+          setFieldError(passwordInput, passwordError, 'Use at least 8 characters for your password.');
+          valid = false;
+        } else if (new TextEncoder().encode(password).length > 72) {
+          setFieldError(passwordInput, passwordError, 'Your password is too long. Use no more than 72 bytes.');
+          valid = false;
+        }
+        if (!termsInput.checked) {
+          termsError.textContent = 'You must agree to the Terms and Privacy Policy.';
+          valid = false;
+        }
+        return valid ? { name, email, password } : null;
+      }
+
+      function passwordScore(password) {
+        if (!password) return 0;
+        let score = 0;
+        if (password.length >= 8) score += 1;
+        if (password.length >= 12) score += 1;
+        if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score += 1;
+        if (/\d/.test(password) && /[^A-Za-z0-9]/.test(password)) score += 1;
+        return Math.min(4, score);
+      }
+
+      function updateStrength() {
+        const score = passwordScore(passwordInput.value);
+        const states = ['', 'weak', 'fair', 'good', 'strong'];
+        const labels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+        passwordStrength.classList.toggle('show', passwordInput.value.length > 0);
+        strengthLabel.textContent = labels[score] || 'Weak';
+        strengthBars.forEach((bar, index) => {
+          bar.className = index < score ? `active ${states[score]}` : '';
+        });
+      }
+
+      function showResult(type, title, message, actionHtml = '') {
+        resultPanel.className = `result-panel show ${type}`;
+        resultIcon.innerHTML = icons[type] || icons.error;
+        resultTitle.textContent = title;
+        resultMessage.textContent = message;
+        resultAction.innerHTML = actionHtml;
+        resultPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      async function registerMember(data) {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/register_member`, {
+          method: 'POST',
+          headers: {
+            apikey: SUPABASE_PUBLISHABLE_KEY,
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+          },
+          body: JSON.stringify({
+            p_full_name: data.name,
+            p_email: data.email,
+            p_password: data.password,
+            p_terms_accepted: true
+          }),
+          cache: 'no-store'
+        });
+
+        if (!response.ok) {
+          let payload = {};
+          try { payload = await response.json(); } catch (_) { /* Keep fallback message. */ }
+          const error = new Error(payload.message || payload.hint || `Registration request failed (${response.status}).`);
+          error.status = response.status;
+          error.code = payload.code;
+          throw error;
+        }
+        return response.json();
+      }
+
+      async function handleSubmit(event) {
+        event.preventDefault();
+        resultPanel.className = 'result-panel';
+        const data = validateForm();
+        if (!data) {
+          registerForm.querySelector('.invalid')?.focus();
+          return;
+        }
+
+        let registrationComplete = false;
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<span class="spinner"></span> Creating your account…';
+
+        try {
+          const response = await registerMember(data);
+          if (response?.success) {
+            registrationComplete = true;
+            let authResult = response;
+
+            // Older register_member versions may not issue a session. Create one through login_member.
+            if (!authResult.session_token) {
+              try {
+                const loginResponse = await fetch(`${SUPABASE_URL}/rest/v1/rpc/login_member`, {
+                  method: 'POST',
+                  headers: { apikey: SUPABASE_PUBLISHABLE_KEY, 'Content-Type': 'application/json', Accept: 'application/json' },
+                  body: JSON.stringify({ p_email: data.email, p_password: data.password, p_remember_me: false }),
+                  cache: 'no-store'
+                });
+                if (loginResponse.ok) {
+                  const loginPayload = await loginResponse.json();
+                  if (loginPayload?.success) authResult = loginPayload;
+                }
+              } catch (_) { /* Account creation still succeeded; the member can log in manually. */ }
+            }
+
+            const safeUser = {
+              id: response.owner_id,
+              owner_id: response.owner_id,
+              full_name: response.full_name,
+              email: response.email,
+              account_status: response.account_status
+            };
+            ['linkcode_auth', 'linkcode_user', 'linkcode_session_token', 'linkcode_session_expires'].forEach(key => {
+              localStorage.removeItem(key);
+              sessionStorage.removeItem(key);
+            });
+
+            if (authResult.session_token) {
+              sessionStorage.setItem('linkcode_auth', 'true');
+              sessionStorage.setItem('linkcode_user', JSON.stringify(safeUser));
+              sessionStorage.setItem('linkcode_session_token', authResult.session_token);
+              sessionStorage.setItem('linkcode_session_expires', authResult.session_expires_at || '');
+              showResult('success', 'Account created successfully', 'Welcome to LinkCode. Opening your dashboard now…');
+              registerForm.reset();
+              updateStrength();
+              window.setTimeout(() => window.location.assign(DASHBOARD_URL), 1600);
+            } else {
+              showResult('success', 'Account created successfully', 'Your account is ready. Log in to create a secure dashboard session.');
+              window.setTimeout(() => window.location.assign(`./Login.html?email=${encodeURIComponent(data.email)}`), 1800);
+            }
+            return;
+          }
+
+          const reason = response?.reason || 'UNKNOWN';
+          if (reason === 'MEMBER_EXISTS') {
+            const recoveryUrl = `./recovry.html?email=${encodeURIComponent(data.email)}`;
+            showResult(
+              'exists',
+              'This member already exists',
+              'An account is already registered with this email address.',
+              `<a class="recovery-button" href="${recoveryUrl}">Recover password ${icons.arrow}</a>`
+            );
+            passwordInput.value = '';
+            updateStrength();
+            return;
+          }
+
+          const messages = {
+            INVALID_NAME: 'Enter a valid full name between 2 and 100 characters.',
+            INVALID_EMAIL: 'Enter a valid email address.',
+            INVALID_PASSWORD: 'Your password must contain at least 8 characters.',
+            TERMS_REQUIRED: 'You must accept the Terms and Privacy Policy.'
+          };
+          showResult('error', 'Registration could not be completed', messages[reason] || 'Review your information and try again.');
+        } catch (error) {
+          console.error('Member registration failed:', error);
+          const setupMissing = error.code === 'PGRST202' || error.status === 404 || /register_member/i.test(error.message);
+          showResult(
+            'error',
+            'Unable to create your account',
+            setupMissing
+              ? 'The registration service is not configured. Run supabase-register-member.sql in Supabase.'
+              : (error.message || 'Check your connection and try again in a moment.')
+          );
+        } finally {
+          if (!registrationComplete) {
+            submitButton.disabled = false;
+            submitButton.innerHTML = `Create my account ${icons.arrow}`;
+          }
+        }
+      }
+
+      passwordToggle.addEventListener('click', () => {
+        const showing = passwordInput.type === 'text';
+        passwordInput.type = showing ? 'password' : 'text';
+        passwordToggle.setAttribute('aria-pressed', String(!showing));
+        passwordToggle.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+      });
+      passwordInput.addEventListener('input', updateStrength);
+      fullNameInput.addEventListener('input', () => setFieldError(fullNameInput, nameError, ''));
+      emailInput.addEventListener('input', () => setFieldError(emailInput, emailError, ''));
+      passwordInput.addEventListener('input', () => setFieldError(passwordInput, passwordError, ''));
+      termsInput.addEventListener('change', () => { if (termsInput.checked) termsError.textContent = ''; });
+      registerForm.addEventListener('submit', handleSubmit);
+
+      const prefilledEmail = new URLSearchParams(window.location.search).get('email');
+      if (prefilledEmail) emailInput.value = prefilledEmail.slice(0, 254);
+    })();
+  </script>
+</body>
+</html>
